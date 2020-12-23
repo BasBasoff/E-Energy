@@ -1,20 +1,25 @@
 """
 Definition of views.
 """
-
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpRequest
 
+from .models import EntranceMeasure
+
 def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
+    measures = EntranceMeasure.objects.all()
+    measures_json = json.dumps(list(measures), cls=DjangoJSONEncoder, default=str)
     return render(
         request,
         'app/index.html',
         {
             'title':'Home Page',
-            'year':datetime.now().year,
+            'values':measures_json
         }
     )
 
