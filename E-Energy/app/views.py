@@ -12,14 +12,15 @@ from .models import EntranceMeasure
 def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
-    measures = EntranceMeasure.objects.all()
-    measures_json = json.dumps(list(measures), cls=DjangoJSONEncoder, default=str)
+    measures = EntranceMeasure.objects.all().values()
+    measures_json = json.dumps(list(measures), cls=DjangoJSONEncoder)
     return render(
         request,
         'app/index.html',
         {
             'title':'Home Page',
-            'values':measures_json
+            'values':measures_json,
+            'measures':measures
         }
     )
 
