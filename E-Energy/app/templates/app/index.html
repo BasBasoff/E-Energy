@@ -3,31 +3,99 @@
 {% block content %}
 
 <div class="row">
-    <div class="col">        
-        <div class="ct-chart ct-perfect-fourth">            
-        </div>        
-    </div>
+	<div class="col">
+		<h2>{#Имя компании#}</h2>
+		<div class="header d-flex flex-row justify-content-between">
+			<div class="tarif">
+				<p class="font-weight-bold">Действующий тариф на электроэнергию (руб/кВт*ч)</p>
+				<input class="form-control" type="text" placeholder="{#Значение тарифа#}" readonly>
+			</div>
+			<div class="filter">
+				<label for="date1">Начало периода</label>
+				<input type="date" class="form-control" id="date1" >
+				<label for="date2">Начало периода</label>
+				<input type="date" class="form-control" id="date2" >
+			</div>
+		</div>
+		<div class="sum">
+			<p class="font-weight-bold">Фактический расход электроэнергии (кВт*ч)</p>
+			<div class="text-muted">    
+				{#Сумма расхода по всем счетчикам за всё время#}
+			</div>
+			<p class="font-weight-bold">Фактическая экономия электроэнергии:</p>
+			<ul>
+				<li>
+					<p class="font-weight-bold">За период (кВт*ч)</p>
+					<p class="text-muted">
+						{#Расход за указанный период#} 
+					</p>
+				</li>
+				<li>
+					<p class="font-weight-bold">За период (руб)</p>
+					<p class="text-muted">
+						{#Расход за период * тариф#}
+					</p>
+				</li>
+				<li>
+					<p class="font-weight-bold">За период (%)</p>
+					<p class="text-muted">
+						{#????????????#}
+					</p>
+				</li>
+			</ul>
+		</div>
+
+		<div class="chart d-flex flex-column">
+			<a class="mx-auto" href="#" data-toggle="modal" data-target="#large-chart">
+				<h5>{#chart.name#}Заголовок</h5>
+			</a>
+			<div class="ct-chart ct-perfect-fourth" id="chart">            
+			
+			</div>			
+		</div>
+
+		<div class="modal fade" id="large-chart" tabindex="-1" role="img" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered position-static">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">{#chart.name#}</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="ct-chart ct-perfect-fourth" id="chart-large">            
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
-    var values = {{values|safe}};
-    data_arr = []
-    values.forEach(el => data_arr.push(Number(el.data)));
-    date_arr = []
-    values.forEach(el => date_arr.push(Date(el.date)));
+	var values = {{values|safe}};
+	data_arr = []
+	values.forEach(el => data_arr.push(Number(el.data)));
+	date_arr = []
+	values.forEach(el => date_arr.push(Date(el.date)));
 
-    var data = {
-        // A labels array that can contain any sort of values
-        labels: date_arr,
-        // Our series array that contains series objects or in this case series data arrays
-        series: [data_arr]
-    };
-    
-    
-    // Create a new line chart object where as first parameter we pass in a selector
-    // that is resolving to our chart container element. The Second parameter
-    // is the actual data object.
-    new Chartist.Line('.ct-chart', data);
+	var data = {
+		// A labels array that can contain any sort of values
+		labels: date_arr,
+		// Our series array that contains series objects or in this case series data arrays
+		series: [data_arr]
+	};
+	
+	
+	// Create a new line chart object where as first parameter we pass in a selector
+	// that is resolving to our chart container element. The Second parameter
+	// is the actual data object.
+	new Chartist.Line('#chart', data);
+	new Chartist.Line('#chart-large', data);
 </script>
 
 

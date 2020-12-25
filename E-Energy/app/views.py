@@ -18,7 +18,7 @@ def home(request):
         request,
         'app/index.html',
         {
-            'title':'Home Page',
+            'title':'Главная',
             'values':measures_json,
             'measures':measures
         }
