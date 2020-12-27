@@ -7,20 +7,26 @@ from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpRequest
 
-from .models import EntranceMeasure
+from .models import *
 
-def home(request):
+def home(request, dev_id=4):
     """Renders the home page."""
-    assert isinstance(request, HttpRequest)
-    measures = EntranceMeasure.objects.all().values()
-    measures_json = json.dumps(list(measures), cls=DjangoJSONEncoder)
+    assert isinstance(request,  HttpRequest)
+    #user = Users.objects.get(id_user=request.user.id_user)
+    devices = Devices.objects.all()
+    device = Devices.objects.get(device_id=dev_id)
+    adapter = Adapters.objects.filter(id_device=device.device_id).values('id_adapter')
+    record = Records.objects.filter(id_adapter=adapter).values('id_record')
+    measures = Data.objects.filter(id_record=record).values()   
     return render(
         request,
         'app/index.html',
         {
             'title':'Главная',
-            'values':measures_json,
-            'measures':measures
+            #'values':measures_json,
+            'measures':measures,
+            'values':measures,
+            'devices':devices
         }
     )
 

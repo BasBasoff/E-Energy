@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="row">
-	<div class="col">
+	<div class="col">		
 		<h2>{#Имя компании#}</h2>
 		<div class="header d-flex flex-row justify-content-between">
 			<div class="tarif">
@@ -11,10 +11,24 @@
 				<input class="form-control" type="text" placeholder="{#Значение тарифа#}" readonly>
 			</div>
 			<div class="filter">
-				<label for="date1">Начало периода</label>
-				<input type="date" class="form-control" id="date1" >
-				<label for="date2">Начало периода</label>
-				<input type="date" class="form-control" id="date2" >
+				<form class="form" action="{% url 'home' %}">
+					<label for="date1">Начало периода</label>
+					<input type="date" class="form-control" id="date1" >
+					<label for="date2">Начало периода</label>
+					<input type="date" class="form-control" id="date2" >
+					<input type="submit" value="Применить фильтр"/> 
+				</form>
+			</div>
+			<div class="device dropdown">
+				<button class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Выбор девайса
+				</button>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					{% for dev in devices %}
+						<a class="dropdown-item" href="/{{dev.id_device}}">{{dev.device_name}}</a>
+					{% empty %}
+					{% endfor %}
+				</div>
 			</div>
 		</div>
 		<div class="sum">
@@ -49,8 +63,7 @@
 			<a class="mx-auto" href="#" data-toggle="modal" data-target="#large-chart">
 				<h5>{#chart.name#}Заголовок</h5>
 			</a>
-			<div class="ct-chart ct-perfect-fourth" id="chart">            
-			
+			<div class="ct-chart ct-perfect-fourth" id="chart">			
 			</div>			
 		</div>
 
@@ -72,6 +85,74 @@
 					</div>
 				</div>
 			</div>
+		</div>
+
+		<div class="entrances">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th rowspan="3" class="text-center">Энерговвод</th>
+						<th rowspan="3" class="text-center">Фактический расход электроэнергии (кВт*ч)</th>
+						<th rowspan="2" class="text-center" colspan="3">Фактическая экономия электроэнергии за текущие сутки</th>
+						<th colspan="6" class="text-center">Ток (А)</th>
+						<th colspan="6" class="text-center">Напряжение (В)</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center">Фаза A</th>
+						<th colspan="2" class="text-center">Фаза B</th>
+						<th colspan="2" class="text-center">Фаза C</th>
+						  			    
+						<th colspan="2" class="text-center">Фаза A</th>
+						<th colspan="2" class="text-center">Фаза B</th>
+						<th colspan="2" class="text-center">Фаза C</th>
+					</tr>
+					<tr>
+						<th scope="col">(кВт*ч)</th>
+						<th scope="col">(руб)</th>
+						<th scope="col">(%)</th>
+								  
+						<th scope="col">Вход</th>
+						<th scope="col">Выход</th>
+						<th scope="col">Вход</th>
+						<th scope="col">Выход</th>
+						<th scope="col">Вход</th>
+						<th scope="col">Выход</th>
+								  
+						<th scope="col">Вход</th>
+						<th scope="col">Выход</th>
+						<th scope="col">Вход</th>
+						<th scope="col">Выход</th>
+						<th scope="col">Вход</th>
+						<th scope="col">Выход</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for entrance in entrances %}
+					<tr>
+						<td>
+							<a href="/entrances/{{entrance.id}}">{{entrance.name}}</a>
+						</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					{% empty %}
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>

@@ -2,19 +2,36 @@
 
 {% block content %}
 
-<h2>{{ title }}.</h2>
-<h3>{{ message }}</h3>
+<h2>{{ title }}</h2>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+<div class="entrances">
+    <ul class="list-group">
+        <li>
+            <h4 class="col-6 font-weight-bold">Вход</h4>
+            <h4 class="col-6 font-weight-bold">Выход</h4>
+        </li>
+        {% for entrance in entrances %}
+            <li>
+                <div class="shadow col-6">
+                    <input type="hidden" value="{{entrance.input_value}}" />
+                    <div class="chart" id="chart_{{entrance.id}}"></div>
+                    <a href="/entrances/{{entrance.id}}">{{entrance.title}}</a>
+                </div>
+                <div class="shadow col-6">
+                    <input type="hidden" value="{{entrance.output_value}}" />
+                    <div class="chart" id="chart_{{entrance.id}}"></div>
+                    <a href="/entrances/{{entrance.id}}">{{entrance.title}}</a>
+                </div>
+            </li>
+        {% empty %}
+        {% endfor %}
+    </ul>
 
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+    <script type="text/javascript">
+        //TODO: Здесь должна быть отрисовка всех этих графиков
+    </script>
+</div>
+
+
 
 {% endblock %}
