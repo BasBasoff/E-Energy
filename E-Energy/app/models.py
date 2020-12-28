@@ -264,5 +264,5 @@ class Versions(models.Model):
 
 class DevicesToUsers(models.Model):
     id_pk = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    id_user = models.ManyToManyField(Users)
-    id_device = models.ManyToManyField(Devices)
+    id_user = models.ForeignKey(Users, null=True, on_delete = models.CASCADE)
+    id_device = models.ForeignKey(Devices, null=True, on_delete = models.CASCADE)
