@@ -6,7 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+import uuid
 
 class Actions(models.Model):
     id_action = models.AutoField(db_column='ID_ACTION', primary_key=True)  # Field name made lowercase.
@@ -78,6 +78,7 @@ class Data(models.Model):
         managed = False
         db_table = 'data'
         unique_together = (('id_record', 'id_parameter'),)
+
 
 
 class DataCur(models.Model):
@@ -260,3 +261,8 @@ class Versions(models.Model):
     class Meta:
         managed = False
         db_table = 'versions'
+
+class DevicesToUsers(models.Model):
+    id_pk = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id_user = models.ManyToManyField(Users)
+    id_device = models.ManyToManyField(Devices)

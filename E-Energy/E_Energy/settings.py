@@ -89,7 +89,7 @@ DATABASES = {
         'OPTIONS':{
             'driver':'ODBC Driver 17 for SQL Server'            
             }
-    }
+    },
 }
 DATABASE_CONNECTION_POOLING = False
 
