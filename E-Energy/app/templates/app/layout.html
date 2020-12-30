@@ -32,8 +32,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav flex-row">
                     <li><a href="{% url 'home' %}">Главная</a></li>
-                    <li><a href="{% url 'entrances' %}"></a>Энерговводы</li>
-                    <li><a href="{% url 'contact' %}">Контакты</a></li>
+                    <li><a href="{% url 'entrances' %}">Энерговводы</a></li>                    
                     {% if user.is_superuser %}
                         <li><a href="/admin/">Админка</a></li>
                     {% endif %}

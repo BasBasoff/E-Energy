@@ -12,7 +12,6 @@ from app import forms, views
 urlpatterns = [
     path('', views.home, name='home'),
     path('<int:dev_id>/', views.home, name='home_with_devid'),
-    path('contact/', views.contact, name='contact'),
     path('entrances/', views.entrances, name='entrances'),
     path('login/',
          LoginView.as_view
@@ -21,7 +20,7 @@ urlpatterns = [
              authentication_form=forms.BootstrapAuthenticationForm,
              extra_context=
              {
-                 'title': 'Log in',
+                 'title': 'Вход',
                  'year' : datetime.now().year,
              }
          ),

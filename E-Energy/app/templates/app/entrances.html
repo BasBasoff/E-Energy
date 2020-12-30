@@ -5,12 +5,15 @@
 <h2>{{ title }}</h2>
 
 <div class="entrances">
-    <ul class="list-group">
-        <li>
-            <h4 class="col-6 font-weight-bold">Вход</h4>
-            <h4 class="col-6 font-weight-bold">Выход</h4>
-        </li>
+    <ul class="list-group">     
+        {% for val in entrance %}
+        {{val.measure_value}}
+        {% endfor %}
         {% for entrance in entrances %}
+        <li>
+            <h4 class="col-6 font-weight-bold">Р’С…РѕРґ</h4>
+            <h4 class="col-6 font-weight-bold">Р’С‹С…РѕРґ</h4>
+        </li>
             <li>
                 <div class="shadow col-6">
                     <input type="hidden" value="{{entrance.inp}}" />
@@ -24,11 +27,16 @@
                 </div>
             </li>
         {% empty %}
+        <li>
+            <h4 class="text-warning">
+                {{error}}
+            </h4>
+        </li>        
         {% endfor %}
     </ul>
 
     <script type="text/javascript">
-        //TODO: Здесь должна быть отрисовка всех этих графиков
+        //TODO: Р—РґРµСЃСЊ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РѕС‚СЂРёСЃРѕРІРєР° РІСЃРµС… СЌС‚РёС… РіСЂР°С„РёРєРѕРІ
     </script>
 </div>
 

@@ -6,6 +6,9 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 import uuid
 
 class Actions(models.Model):
@@ -245,7 +248,7 @@ class Users(models.Model):
     user_password = models.CharField(db_column='USER_PASSWORD', max_length=30, blank=True, null=True)  # Field name made lowercase.
     user_role = models.IntegerField(db_column='USER_ROLE')  # Field name made lowercase.
     user_name = models.CharField(db_column='USER_NAME', max_length=150, blank=True, null=True)  # Field name made lowercase.
-    user_description = models.TextField(db_column='USER_DESCRIPTION', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+    user_description = models.TextField(db_column='USER_DESCRIPTION', blank=True, null=True)  # Field name made lowercase. This field type is a guess
 
     class Meta:
         managed = False
@@ -262,7 +265,31 @@ class Versions(models.Model):
         managed = False
         db_table = 'versions'
 
-class DevicesToUsers(models.Model):
+class Profile(models.Model):
     id_pk = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    id_user = models.ForeignKey(Users, null=True, on_delete = models.CASCADE)
-    id_device = models.ForeignKey(Devices, null=True, on_delete = models.CASCADE)
+    u_login = models.CharField(unique=True, max_length=30, default='_Login_is_non_provided')
+    u_password = models.CharField(max_length=30, blank=True, null=True)
+    u_role = models.IntegerField(default='2')
+    u_name = models.CharField(max_length=150, blank=True, null=True)
+    user_id = models.OneToOneField(Users, null=True, on_delete = models.CASCADE)
+    user_auth = models.OneToOneField(User, on_delete=models.CASCADE)
+    id_device = models.ManyToManyField(Devices, null=True)
+    
+    def save(self, *args, **kwargs):
+        user_auth = User.objects.create_user(username=self.u_login, password=self.u_password)
+        users = Users(user_login=self.u_login, user_password=self.u_password, user_role=self.u_role, user_name=self.u_name)
+        users.save()
+        self.user_auth_id = user_auth.id
+        self.user_id_id = users.id_user
+        super(Profile, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        #u = User.objects.get(id=self.user_auth_id)
+        self.user_auth_id.delete()
+        self.user_id_id.delete()
+        super(Profile, self).delete(*args, **kwargs)
+
+#@receiver(pre_delete, sender=Profile)
+#def delete_profile_hook(sender, instance, using, **kwargs):
+#    instance.user_id.delete()
+#    instance.user_auth.delete()
