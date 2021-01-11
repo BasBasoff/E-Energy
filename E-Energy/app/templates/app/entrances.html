@@ -4,39 +4,28 @@
 
 <h2>{{ title }}</h2>
 
-<div class="entrances">
-    <ul class="list-group">     
-        {% for val in entrance %}
-        {{val.measure_value}}
-        {% endfor %}
-        {% for entrance in entrances %}
-        <li>
-            <h4 class="col-6 font-weight-bold">Вход</h4>
-            <h4 class="col-6 font-weight-bold">Выход</h4>
-        </li>
-            <li>
-                <div class="shadow col-6">
-                    <input type="hidden" value="{{entrance.inp}}" />
-                    <div class="chart" id="chart_{{entrance.id}}"></div>
-                    <a href="/entrances/{{entrance.id}}">{{entrance.title}}</a>
-                </div>
-                <div class="shadow col-6">
-                    <input type="hidden" value="{{entrance.out}}" />
-                    <div class="chart" id="chart_{{entrance.id}}"></div>
-                    <a href="/entrances/{{entrance.id}}">{{entrance.title}}</a>
-                </div>
-            </li>
-        {% empty %}
-        <li>
-            <h4 class="text-warning">
-                {{error}}
-            </h4>
-        </li>        
-        {% endfor %}
-    </ul>
+<div class="entrances">                 
+        {% for adapter in data%}
+            <div class="col-6">
+                <h4 class="col-6 font-weight-bold">{{adapter}}</h4>
+                {% for param in adapter %}
+                    <div class="d-flex chart">
+                        <p>{{param}}</p>
+                        <input type="hidden" id="{{adapter}}{{parameter}}" value="{{param.values}}" />
+                        <!--input type="hidden" id="{#adapter}}{{parameter}}" value="{{param.values#}" /-->
+                        <div id="{{adapter}}{{parameter}}_chart">
+
+                        </div>
+                    </div>    
+                {% empty %}
+                {% endfor %}
+            </div>            
+        {% empty %}               
+        {% endfor %}    
 
     <script type="text/javascript">
         //TODO: Здесь должна быть отрисовка всех этих графиков
+
     </script>
 </div>
 
