@@ -9,21 +9,15 @@ from django.http import HttpRequest
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 
+
 from .models import *
 
 @login_required
-def home(request, dev_id=4):
+def home(request):
     """Renders the home page."""
     assert isinstance(request,  HttpRequest)
-    #user = Users.objects.get(id_user=request.user.id_user)
-    devices = Devices.objects.all()
-    device = Devices.objects.get(device_id=dev_id)
-    #adapter = picle(Adapters.objects.filter(id_device=device.device_id).values('id_adapter'))
-    #record = list(Records.objects.filter(id_adapter__in=adapter.id_adapter).values('id_record'))
-    #parameters = ['Полная мощность']
-    #measures = list(Data.objects.filter(id_parameter__in=parameters).filter(id_record__id_adapter__id_device=device.device_id))
-    #measures_json = serializers.serialize('json', measures)
-    #measures_json_string = str(measures_json)
+    devices = Devices.objects.filter(profile__user_auth_id = request.user.id)
+
     return render(
         request,
         'app/index.html',
@@ -37,50 +31,124 @@ def home(request, dev_id=4):
     )
 
 class Entrance():
-    def __init__(self, inp, out):
-        self.inp = inp
-        self.out = out
+    def __init__(self, adapter_name, par_name, data=[]):
         self.id = id
+        self.adapter_name = adapter_name
+        self.par_name = par_name
+        self.data = data
 
 @login_required
-def entrances(request):
-    #user = Users.objects.get(id_user=request.user.id)
-    error = None
-#    try:
-    
+def entrances(request, device_id):
+    #device = Devices.objects.get(device_id = device_id)
 
-    #devices = Devices.objects.filter(profile__user_auth = request.user.id)
-    #devices_id_list = []
-    #for i in devices:
-    #    devices_id_list.append(i.device_id)    
-    #par_list = list(AdapterParameters.objects.filter(id_adapter__in = adp_id_list))
-    #adap_list = Adapters.objects.filter(id_device_id__profile__user_auth = request.user.id)
-    par_list = list(AdapterParameters.objects.filter(id_adapter__id_device_id__profile__user_auth = request.user.id, parameter_name__icontains = 'ток').values('id_parameter'))
-    #par_id_list = []
-    #for i in par_list:
-    #    par_id_list.append(i.id_parameter)
-    
-    data = Data.objects.filter(id_parameter__in = par_list['id_parameter']).values('measure_value')
-    #adap_list = Adapters.objects.filter(id_device_id__in = devices_id_list)
-    #adp_id_list = []
-    #for i in adap_list:
-    #    adp_id_list.append(i.id_adapter)
-    #data = Data.objects.filter(id_parameter__in = par_id_list)
+    adapters_in = Adapters.objects.filter(id_device_id = device_id, adapter_name__icontains = 'вход').values_list('id_adapter', flat=True)
+    adapters_out = Adapters.objects.filter(id_device_id = device_id, adapter_name__icontains = 'выход').values_list('id_adapter', flat=True)
 
-    #param_id_in = AdapterParameters.objects.filter(id_adapter_id__devices__profile__user_auth_id = request.user.id).filter(adapter__adapter_name__icontains = 'вход').values('id_parameter')
-    #param_id_out = AdapterParameters.objects.filter(devices__profile__user_auth = request.user.id).filter(adapter__adapter_name__icontains = 'выход').values('id_parameter')
-    #data_in = Data.objects.filter(id_parameter = param_id_in.id_parameter).value('measure_value')
-    #data_out = Data.objects.filter(id_parameter = param_id_out.id_parameter).value('measure_value')
-    #data = Entrance(data_in.measure_value, data_out.measure_value)
-#    except Exception:
-#        data = Entrance(0,0)
-#        error = 'У вас пока нет устройств для отображения'
+    for a in adapters_in:
+        param_current_in_A = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'ток фазы 1').values('id_parameter')
+        param_current_in_B = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'ток фазы 2').values('id_parameter')
+        param_current_in_C = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'ток фазы 3').values('id_parameter')
+
+        param_voltage_in_A = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'напряжение фазы 1')
+        param_voltage_in_B = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'напряжение фазы 2')
+        param_voltage_in_C = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'напряжение фазы 3')
+
+    for a in adapters_out:
+        param_current_out_A = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'ток фазы 1').values('id_parameter')
+        param_current_out_B = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'ток фазы 2').values('id_parameter')
+        param_current_out_C = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'ток фазы 3').values('id_parameter')
+
+        param_voltage_out_A = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'напряжение фазы 1')
+        param_voltage_out_B = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'напряжение фазы 2')
+        param_voltage_out_C = AdapterParameters.objects.filter(id_adapter = a).filter(parameter_name__icontains = 'напряжение фазы 3')
+
+    #param_current_in_A = list(AdapterParameters.objects.filter(id_adapter__in = adapters_in).filter(parameter_name__icontains = 'ток фазы 1').values('id_parameter', 'parameter_name'))
+    #data = Data.objects.filter(id_parameter = param_current_in_A[id_parameter]).values('measure_value', 'id_parameter')
+    #current_in_A = Entrance('вход', param_current_in_A.parameter_name, data)
+
+    #param_current_in_B = AdapterParameters.objects.filter(id_adapter__in = adapter_in.id_adapter).filter(parameter_name__icontains = 'ток фазы 2', )
+    #data = Data.objects.filter(id_parameter = param_current_in_B.id_parameter).values_list('measure_value', flat=True)
+    #current_in_B = Entrance('вход', param_current_in_B.parameter_name, data)
+    #
+    #param_current_in_C = AdapterParameters.objects.filter(id_adapter__in = adapter_in.id_adapter).filter(parameter_name__icontains = 'ток фазы 3', )
+    #data = Data.objects.filter(id_parameter = param_current_in_C.id_parameter).values_list('measure_value', flat=True)
+    #current_in_C = Entrance('вход', param_current_in_C.parameter_name, data)
+    #
+    #param_voltage_in_A = AdapterParameters.objects.filter(id_adapter__in = adapter_in.id_adapter).filter(parameter_name__icontains = 'напряжение фазы 1', )
+    #data = Data.objects.filter(id_parameter = param_voltage_in_A.id_parameter).values_list('measure_value', flat=True)
+    #voltage_in_A = Entrance('вход', param_voltage_in_A.parameter_name, data)
+    #
+    #param_voltage_in_B = AdapterParameters.objects.filter(id_adapter__in = adapter_in.id_adapter).filter(parameter_name__icontains = 'напряжение фазы 2', )
+    #data = Data.objects.filter(id_parameter = param_voltage_in_B.id_parameter).values_list('measure_value', flat=True)
+    #voltage_in_B = Entrance('вход', param_voltage_in_B.parameter_name, data)
+    #
+    #param_voltage_in_C = AdapterParameters.objects.filter(id_adapter__in = adapter_in.id_adapter).filter(parameter_name__icontains = 'напряжение фазы 3', )
+    #data = Data.objects.filter(id_parameter = param_voltage_in_C.id_parameter).values_list('measure_value', flat=True)
+    #voltage_in_C = Entrance('вход', param_voltage_in_C.parameter_name, data)
+    #
+    #
+    #param_current_out_A = AdapterParameters.objects.filter(id_adapter__in = adapter_out.id_adapter).filter(parameter_name__icontains = 'ток фазы 1', )
+    #data = Data.objects.filter(id_parameter = param_current_out_A.id_parameter).values_list('measure_value', flat=True)
+    #current_out_A = Entrance('выход', param_current_out_A.parameter_name, data)
+    #
+    #param_current_out_B = AdapterParameters.objects.filter(id_adapter__in = adapter_out.id_adapter).filter(parameter_name__icontains = 'ток фазы 2', )
+    #data = Data.objects.filter(id_parameter = param_current_out_B.id_parameter).values_list('measure_value', flat=True)
+    #current_out_B = Entrance('выход', param_current_out_B.parameter_name, data)
+    #
+    #param_current_out_C = AdapterParameters.objects.filter(id_adapter__in = adapter_out.id_adapter).filter(parameter_name__icontains = 'ток фазы 3', )
+    #data = Data.objects.filter(id_parameter = param_current_out_C.id_parameter).values_list('measure_value', flat=True)
+    #current_out_C = Entrance('выход', param_current_out_C.parameter_name, data)
+    #
+    #param_voltage_out_A = AdapterParameters.objects.filter(id_adapter__in = adapter_out.id_adapter).filter(parameter_name__icontains = 'напряжение фазы 1', )
+    #data = Data.objects.filter(id_parameter = param_voltage_out_A.id_parameter).values_list('measure_value', flat=True)
+    #voltage_out_A = Entrance('выход', param_voltage_out_A.parameter_name, data)
+    #
+    #param_voltage_out_B = AdapterParameters.objects.filter(id_adapter__in = adapter_out.id_adapter).filter(parameter_name__icontains = 'напряжение фазы 2', )
+    #data = Data.objects.filter(id_parameter = param_voltage_out_B.id_parameter).values_list('measure_value', flat=True)
+    #voltage_out_B = Entrance('выход', param_voltage_out_B.parameter_name, data)
+    #
+    #param_voltage_out_C = AdapterParameters.objects.filter(id_adapter__in = adapter_out.id_adapter).filter(parameter_name__icontains = 'напряжение фазы 3', )
+    #data = Data.objects.filter(id_parameter = param_voltage_out_C.id_parameter).values_list('measure_value', flat=True)
+    #voltage_out_C = Entrance('выход', param_voltage_out_C.parameter_name, data)
+
+    #for adap in adapter_list_in:
+    #    for p in params_current_in = AdapterParameters.objects.filter(id_adapter__in = adap_list_in).filter(parameter_name__icontains = 'ток').values_list('id_parameter', flat=True)
+    #params_voltage_in = AdapterParameters.objects.filter(id_adapter__in = adap_list_in).filter(parameter_name__icontains = 'напряжение').values_list('id_parameter', flat=True)
+    #params_current_out = AdapterParameters.objects.filter(id_adapter__in = adap_list_out).filter(parameter_name__icontains = 'ток').values_list('id_parameter', flat=True)
+    #params_voltage_out = AdapterParameters.objects.filter(id_adapter__in = adap_list_out).filter(parameter_name__icontains = 'напряжение').values_list('id_parameter', flat=True)
+    #data_current_in = []
+    #data_voltage_in = []
+    #data_current_out = []
+    #data_voltage_out = []
+    #for adpater in adap_list_in:
+    #    for data, param in zip([data_current_in, data_current_out,data_voltage_in,data_voltage_out],[params_current_in,params_current_out,params_voltage_in,params_voltage_out]):
+    #        for p in param:
+    #            data.append(list(Data.objects.filter(id_parameter = p).values_list('measure_value', flat=True)))
+    #
+    #data_current_in_json =  json.dumps(data_current_in)
+    #data_voltage_in_json =  json.dumps(data_voltage_in)
+    #data_current_out_json =  json.dumps(data_current_out)
+    #data_voltage_out_json =  json.dumps(data_voltage_out)    
     return render(
         request,
-        'app/entrances.html',
+        'app/entrances.html',        
         {
-            'entrance':data,
-            #'entrances':data,
-            'error':error
+            'current_in_A':current_in_A,
+            #'current_in_B':current_in_B,
+            #'current_in_C':current_in_C,
+            #'current_out_A':current_out_A,
+            #'current_out_B':current_out_B,
+            #'current_out_C':current_out_C,
+            #'voltage_in_A':voltage_in_A,
+            #'voltage_in_B':voltage_in_B,
+            #'voltage_in_C':voltage_in_C,
+            #'voltage_out_A':voltage_out_A,
+            #'voltage_out_B':voltage_out_B,
+            #'voltage_out_C':voltage_out_C,
+            
+            #'data_current_in' :data_current_in_json,
+            #'data_voltage_in ':data_voltage_in_json, 
+            #'data_current_out':data_current_out_json,
+            #'data_voltage_out':data_voltage_out_json,            
         }
 )

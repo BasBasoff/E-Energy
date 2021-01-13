@@ -283,13 +283,7 @@ class Profile(models.Model):
         self.user_id_id = users.id_user
         super(Profile, self).save(*args, **kwargs)
     
-    def delete(self, *args, **kwargs):
-        #u = User.objects.get(id=self.user_auth_id)
+    def delete(self, *args, **kwargs):       
         self.user_auth_id.delete()
         self.user_id_id.delete()
         super(Profile, self).delete(*args, **kwargs)
-
-#@receiver(pre_delete, sender=Profile)
-#def delete_profile_hook(sender, instance, using, **kwargs):
-#    instance.user_id.delete()
-#    instance.user_auth.delete()

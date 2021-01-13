@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="row">
-	<div class="col">		
+	<div-- class="col">		
 		<h2>{#Имя компании#}</h2>
 		<div class="header d-flex flex-row justify-content-between">
 			<div class="tarif">
@@ -20,17 +20,17 @@
 				</form>
 			</div>			
 		</div>
-		<div class="device dropdown">
+		<!--div class="device dropdown">
 				<button class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					Выбор девайса
 				</button>
 				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					{% for dev in devices %}
-						<a class="dropdown-item" href="/{{dev.id_device}}">{{dev.device_name}}</a>
-					{% empty %}
-					{% endfor %}
+					{# for dev in devices #}
+						<a class="dropdown-item" href="/{dev.id_device}}">{dev.device_name}}</a>
+					{# empty #}
+					{# endfor #}
 				</div>
-			</div>
+			</div-->
 		<div class="sum">
 			<p class="font-weight-bold">Фактический расход электроэнергии (кВт*ч)</p>
 			<div class="text-muted">    
@@ -127,10 +127,10 @@
 					</tr>
 				</thead>
 				<tbody>
-					{% for entrance in entrances %}
+					{% for device in devices %}
 					<tr>
 						<td>
-							<a href="/entrances/{{entrance.id}}">{{entrance.name}}</a>
+							<a href="/entrances/{{device.device_id}}">{{device.device_name}}</a>
 						</td>
 						<td></td>
 						<td></td>

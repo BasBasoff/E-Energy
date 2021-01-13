@@ -33,6 +33,7 @@
                 <ul class="nav navbar-nav flex-row">
                     <li><a href="{% url 'home' %}">Главная</a></li>
                     <li><a href="{% url 'entrances' %}">Энерговводы</a></li>                    
+                    <li><a href="{% url 'password_change' %}">Смена пароля</a></li>                    
                     {% if user.is_superuser %}
                         <li><a href="/admin/">Админка</a></li>
                     {% endif %}
