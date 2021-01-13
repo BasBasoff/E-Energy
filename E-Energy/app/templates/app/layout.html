@@ -32,8 +32,18 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav flex-row">
                     <li><a href="{% url 'home' %}">Главная</a></li>
-                    <li><a href="{% url 'entrances' %}">Энерговводы</a></li>                    
-                    <li><a href="{% url 'password_change' %}">Смена пароля</a></li>                    
+                    <li><a href="{% url 'password_change' %}">Смена пароля</a></li>
+                    <li>
+                        <div class="filter">
+			            	<form class="form" action="filter/">
+			            		<label for="date_from">Начало периода</label>
+			            		<input type="date" class="form-control" id="date1" >
+			            		<label for="date_to">Начало периода</label>
+			            		<input type="date" class="form-control" id="date2" >
+			            		<input type="submit" value="Применить фильтр"/> 
+			            	</form>
+			            </div>
+                    </li>
                     {% if user.is_superuser %}
                         <li><a href="/admin/">Админка</a></li>
                     {% endif %}

@@ -10,27 +10,7 @@
 				<p class="font-weight-bold">Действующий тариф на электроэнергию (руб/кВт*ч)</p>
 				<input class="form-control" type="text" placeholder="{#Значение тарифа#}" readonly>
 			</div>
-			<div class="filter">
-				<form class="form" action="{% url 'home' %}">
-					<label for="date1">Начало периода</label>
-					<input type="date" class="form-control" id="date1" >
-					<label for="date2">Начало периода</label>
-					<input type="date" class="form-control" id="date2" >
-					<input type="submit" value="Применить фильтр"/> 
-				</form>
-			</div>			
-		</div>
-		<!--div class="device dropdown">
-				<button class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Выбор девайса
-				</button>
-				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					{# for dev in devices #}
-						<a class="dropdown-item" href="/{dev.id_device}}">{dev.device_name}}</a>
-					{# empty #}
-					{# endfor #}
-				</div>
-			</div-->
+		</div>		
 		<div class="sum">
 			<p class="font-weight-bold">Фактический расход электроэнергии (кВт*ч)</p>
 			<div class="text-muted">    
@@ -59,11 +39,12 @@
 			</ul>
 		</div>
 
-		<div class="chart d-flex flex-column">
+		<div class="d-flex flex-column">
 			<a class="mx-auto" href="#" data-toggle="modal" data-target="#large-chart">
-				<h5>{#chart.name#}Заголовок</h5>
+				<h5>{#chart.name#}Демо график</h5>
 			</a>
-			<div class="ct-chart ct-perfect-fourth" id="chart">			
+			<div class="ct-chart ct-perfect-fourth chart" id="chart">
+				<input type="hidden" id="chart_values" value="{{data}}"/>
 			</div>			
 		</div>
 

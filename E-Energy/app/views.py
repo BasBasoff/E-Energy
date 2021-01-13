@@ -17,15 +17,18 @@ def home(request):
     """Renders the home page."""
     assert isinstance(request,  HttpRequest)
     devices = Devices.objects.filter(profile__user_auth_id = request.user.id)
+    values_list = [1.5, 1.435, 1.330, 2, 1.1, 1.208, 1.7]
+    values = json.dumps(values_list)
+    if request.method == 'POST':
+        date_from = form.cleaned_data['date_from']
+        date_to = form.cleaned_data['date_to']
 
     return render(
         request,
         'app/index.html',
         {
             'title':'Главная',
-            #'values':measures_json,
-            #'measures':measures_json_string,
-            #'values':measures_json_string,
+            'data':values,
             'devices':devices
         }
     )
@@ -44,7 +47,8 @@ def entrances(request, device=4):
         parameters = AdapterParameters.objects.filter(parameter_name__icontains = 'Ток', id_adapter = a.id_adapter) 
         #| AdapterParameters.objects.filter(parameter_name__icontains = 'напряжение', id_adapter = a.id_adapter)
         for p in parameters:
-            data = list(Data.objects.filter(id_parameter = p.id_parameter).values_list('measure_value', flat=True))
+            data_queryset = list(Data.objects.filter(id_parameter = p.id_parameter).values_list('measure_value', flat=True))
+            data = json.dumps(data_queryset)
             data_dict.update({a.adapter_name:{p.parameter_name:data}})
 
     

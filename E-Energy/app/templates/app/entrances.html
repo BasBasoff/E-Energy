@@ -5,30 +5,25 @@
 <h2>{{ device.device_name }}</h2>
 
 <div class="entrances">                 
-        {% for adapter, parameter in data %}
+        {% for adapter, param in data.items %}
             <div class="col-6">
                 <h4 class="col-6 font-weight-bold">{{adapter}}</h4>
-                {#
-                {% for p_name, d in parameter %}
+                {% for p_name, d in param.items %}
                     <p class="text-primary">{{p_name}}</p>                
                     <div class="d-flex chart">                        
                         <input type="hidden" id="{{adapter}}{{p_name}}" value="{{d}}" />
-                        <!--input type="hidden" id="{{adapter}}{{parameter}}" value="{{dt}}" /-->
+                        <!--input type="hidden" id="{{adapter}}{{param}}" value="{{dt}}" /-->
                         <div id="{{adapter}}{{p_name}}_chart">
 
                         </div>
                     </div>    
                 {% empty %}
+				<p>Пусто</p>
                 {% endfor %}
-                    #}
+                    
             </div>            
         {% empty %}               
-        {% endfor %}    
-
-    <script type="text/javascript">
-        //TODO: Здесь должна быть отрисовка всех этих графиков
-
-    </script>
+        {% endfor %}        
 </div>
 
 <div class="modal fade" id="{{param.parameter_name}}_in" tabindex="-1" role="img" aria-hidden="true">
