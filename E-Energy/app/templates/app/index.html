@@ -157,27 +157,5 @@
 	</div>
 </div>
 
-<script type="text/javascript">
-	var values = {{values|safe}};
-	data_arr = []
-	values.forEach(el => data_arr.push(Number(el.data)));
-	date_arr = []
-	values.forEach(el => date_arr.push(Date(el.date)));
-
-	var data = {
-		// A labels array that can contain any sort of values
-		labels: date_arr,
-		// Our series array that contains series objects or in this case series data arrays
-		series: [data_arr]
-	};
-	
-	
-	// Create a new line chart object where as first parameter we pass in a selector
-	// that is resolving to our chart container element. The Second parameter
-	// is the actual data object.
-	new Chartist.Line('#chart', data);
-	new Chartist.Line('#chart-large', data);
-</script>
-
 
 {% endblock %}

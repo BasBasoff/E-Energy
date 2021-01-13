@@ -6,7 +6,7 @@
     <RootNamespace>E-Energy</RootNamespace>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
-    <InterpreterId>MSBuild|env1|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
