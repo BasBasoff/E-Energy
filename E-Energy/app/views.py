@@ -47,9 +47,10 @@ def entrances(request, device=4):
     data_dict = {}
     adapters = Adapters.objects.filter(id_device = device)
     for a in adapters:
-        parameters = AdapterParameters.objects.filter(parameter_name__icontains = 'ток') | AdapterParameters.objects.filter(parameter_name__icontains = 'напряжение')
+        parameters = AdapterParameters.objects.filter(parameter_name__icontains = 'Ток', id_adapter = a.id_adapter) 
+        #| AdapterParameters.objects.filter(parameter_name__icontains = 'напряжение', id_adapter = a.id_adapter)
         for p in parameters:
-            data = Data.objects.filter(id_parameter = p.id_parameter).values_list('measure_value', flat=True)
+            data = list(Data.objects.filter(id_parameter = p.id_parameter).values_list('measure_value', flat=True))
             data_dict.update({a.adapter_name:{p.parameter_name:data}})
 
     

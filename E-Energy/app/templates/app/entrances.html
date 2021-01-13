@@ -5,20 +5,22 @@
 <h2>{{ title }}</h2>
 
 <div class="entrances">                 
-        {% for adapter in data%}
+        {% for adapter, parameter in data %}
             <div class="col-6">
                 <h4 class="col-6 font-weight-bold">{{adapter}}</h4>
-                {% for param in adapter %}
-                    <div class="d-flex chart">
-                        <p>{{param}}</p>
-                        <input type="hidden" id="{{adapter}}{{parameter}}" value="{{param.values}}" />
-                        <!--input type="hidden" id="{#adapter}}{{parameter}}" value="{{param.values#}" /-->
-                        <div id="{{adapter}}{{parameter}}_chart">
+                {#
+                {% for p_name, d in parameter %}
+                    <p class="text-primary">{{p_name}}</p>                
+                    <div class="d-flex chart">                        
+                        <input type="hidden" id="{{adapter}}{{p_name}}" value="{{d}}" />
+                        <!--input type="hidden" id="{{adapter}}{{parameter}}" value="{{dt}}" /-->
+                        <div id="{{adapter}}{{p_name}}_chart">
 
                         </div>
                     </div>    
                 {% empty %}
                 {% endfor %}
+                    #}
             </div>            
         {% empty %}               
         {% endfor %}    
