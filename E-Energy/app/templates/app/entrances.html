@@ -4,15 +4,17 @@
 
 <h2>{{ device.device_name }}</h2>
 
-<div class="entrances">                 
+<div class="entrances">            
         {% for adapter, param in data.items %}
-            <div class="col-6">
+            <div class="col-12">
                 <h4 class="col-6 font-weight-bold">{{adapter}}</h4>
                 {% for p_name, d in param.items %}
                     <p class="text-primary">{{p_name}}</p>                
                     <div class="d-flex chart">                        
                         <input type="hidden" id="{{adapter}}{{p_name}}" value="{{d}}" />
+						{#
                         <!--input type="hidden" id="{{adapter}}{{param}}" value="{{dt}}" /-->
+							#}
                         <div id="{{adapter}}{{p_name}}_chart">
 
                         </div>

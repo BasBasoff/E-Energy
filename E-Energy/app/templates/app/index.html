@@ -3,71 +3,7 @@
 {% block content %}
 
 <div class="row">
-	<div-- class="col">		
-		<h2>{#Имя компании#}</h2>
-		<div class="header d-flex flex-row justify-content-between">
-			<div class="tarif">
-				<p class="font-weight-bold">Действующий тариф на электроэнергию (руб/кВт*ч)</p>
-				<input class="form-control" type="text" placeholder="{#Значение тарифа#}" readonly>
-			</div>
-		</div>		
-		<div class="sum">
-			<p class="font-weight-bold">Фактический расход электроэнергии (кВт*ч)</p>
-			<div class="text-muted">    
-				{#Сумма расхода по всем счетчикам за всё время#}
-			</div>
-			<p class="font-weight-bold">Фактическая экономия электроэнергии:</p>
-			<ul>
-				<li>
-					<p class="font-weight-bold">За период (кВт*ч)</p>
-					<p class="text-muted">
-						{#Расход за указанный период#} 
-					</p>
-				</li>
-				<li>
-					<p class="font-weight-bold">За период (руб)</p>
-					<p class="text-muted">
-						{#Расход за период * тариф#}
-					</p>
-				</li>
-				<li>
-					<p class="font-weight-bold">За период (%)</p>
-					<p class="text-muted">
-						{#????????????#}
-					</p>
-				</li>
-			</ul>
-		</div>
-
-		<div class="d-flex flex-column">
-			<a class="mx-auto" href="#" data-toggle="modal" data-target="#large-chart">
-				<h5>{#chart.name#}Демо график</h5>
-			</a>
-			<div class="ct-chart ct-perfect-fourth chart" id="chart">
-				<input type="hidden" id="chart_values" value="{{data}}"/>
-			</div>			
-		</div>
-
-		<div class="modal fade" id="large-chart" tabindex="-1" role="img" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered position-static">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">{#chart.name#}</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="ct-chart ct-perfect-fourth" id="chart-large">            
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
+	
 		<div class="entrances">
 			<table class="table table-bordered">
 				<thead>
@@ -111,7 +47,12 @@
 					{% for device in devices %}
 					<tr>
 						<td>
-							<a href="/entrances/{{device.device_id}}">{{device.device_name}}</a>
+							<form action="/entrances/{{device.device_id}}" method="post">
+								{% csrf_token %}
+								<input type="hidden" id="date_from" value="{{date_from}}" />
+								<input type="hidden" id="date_to" value="{{date_to}}" />
+								<input type="submit" value="{{device.device_name}}" />
+							</form>							
 						</td>
 						<td></td>
 						<td></td>
@@ -135,6 +76,57 @@
 				</tbody>
 			</table>
 		</div>
+	<div-- class="col">		
+		<h2>{#Имя компании#}</h2>
+		<div class="filter">
+			<form class="form" action="/">
+			    <label for="date_from">Начало периода</label>
+			    <input type="datetime-local" class="form-control" id="date_from" >
+			    <label for="date_to">Начало периода</label>
+			    <input type="datetime-local" class="form-control" id="date_to" >
+			    <input type="submit" value="Применить фильтр"/> 
+			</form>
+		</div>
+		<div class="header d-flex flex-row justify-content-between">
+			<div class="tarif">
+				<p class="font-weight-bold">Действующий тариф на электроэнергию (руб/кВт*ч)</p>
+				<input class="form-control" type="text" placeholder="{#Значение тарифа#}">
+			</div>
+		</div>		
+		<div class="sum">
+			<p class="font-weight-bold">Фактический расход электроэнергии (кВт*ч)</p>
+			<div class="text-muted">    
+				{#Сумма расхода по всем счетчикам за всё время#}
+			</div>
+			<p class="font-weight-bold">Фактическая экономия электроэнергии:</p>
+			<ul>
+				<li>
+					<p class="font-weight-bold">За период (кВт*ч)</p>
+					<p class="text-muted">
+						{#Расход за указанный период#} 
+					</p>
+				</li>
+				<li>
+					<p class="font-weight-bold">За период (руб)</p>
+					<p class="text-muted">
+						{#Расход за период * тариф#}
+					</p>
+				</li>
+				<li>
+					<p class="font-weight-bold">За период (%)</p>
+					<p class="text-muted">
+						{#????????????#}
+					</p>
+				</li>
+			</ul>
+		</div>
+
+		<div class="d-flex flex-column">
+			<div class="ct-chart ct-perfect-fourth chart" id="chart">
+				<input type="hidden" id="chart_values" value="{{data}}"/>
+			</div>			
+		</div>
+
 	</div>
 </div>
 

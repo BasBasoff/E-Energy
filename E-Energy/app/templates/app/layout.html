@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"> />
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - My Django Application</title>
     {% load static %}
@@ -11,11 +11,12 @@
     <!--Chartist-js-->
     <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css"/>
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha256-t9UJPrESBeG2ojKTIcFLPGF7nHi2vEc7f5A2KpH/UBU=" crossorigin="anonymous"></script>
 
     <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
     
     <!--My script-->
-    <script defer src="{% static 'app/scripts/script.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -34,15 +35,6 @@
                     <li><a href="{% url 'home' %}">Главная</a></li>
                     <li><a href="{% url 'password_change' %}">Смена пароля</a></li>
                     <li>
-                        <div class="filter">
-			            	<form class="form" action="filter/">
-			            		<label for="date_from">Начало периода</label>
-			            		<input type="date" class="form-control" id="date1" >
-			            		<label for="date_to">Начало периода</label>
-			            		<input type="date" class="form-control" id="date2" >
-			            		<input type="submit" value="Применить фильтр"/> 
-			            	</form>
-			            </div>
                     </li>
                     {% if user.is_superuser %}
                         <li><a href="/admin/">Админка</a></li>
@@ -66,5 +58,6 @@
     <script src="{% static 'app/scripts/respond.js' %}"></script>
 {% block scripts %}{% endblock %}
 
+    <script defer src="{% static 'app/scripts/script.js' %}"></script>
 </body>
 </html>

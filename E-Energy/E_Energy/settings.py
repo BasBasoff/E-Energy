@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'powerdb',
         'HOST': 'localhost',
         'USER': 'bassist',
-        'PASSWORD':'bassist',
+        'PASSWORD':'12345',
         'OPTIONS':{
             'driver':'ODBC Driver 17 for SQL Server'            
             }
