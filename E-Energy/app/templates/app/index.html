@@ -47,12 +47,9 @@
 					{% for device in devices %}
 					<tr>
 						<td>
-							<form action="/entrances/{{device.device_id}}" method="post">
-								{% csrf_token %}
-								<input type="hidden" id="date_from" value="{{date_from}}" />
-								<input type="hidden" id="date_to" value="{{date_to}}" />
-								<input type="submit" value="{{device.device_name}}" />
-							</form>							
+							<a href="/entrances/{{device.device_id}}">
+								{{device.device_name}}
+							</a>
 						</td>
 						<td></td>
 						<td></td>

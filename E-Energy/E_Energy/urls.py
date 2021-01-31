@@ -13,7 +13,7 @@ from app import forms, views
 urlpatterns = [
     path('', views.home, name='home'),
     path('<int:dev_id>/', views.home, name='home_with_devid'),
-    path('entrances/', views.entrances, name='entrances'),
+    #path('entrances/', views.entrances, name='entrances'),
     path('entrances/<int:device>', views.entrances, name='entrances_with_device_id'),
     path('login/',
          LoginView.as_view

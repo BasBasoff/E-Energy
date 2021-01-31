@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, FilteredRelation, Subquery, F, Prefetch, Count, Max
 from collections import defaultdict
 
-
+from .forms import FilterForm
 from .models import *
 
 @login_required
@@ -39,9 +39,10 @@ def home(request):
 def myconverter(o):
     if isinstance(o, datetime):
         return o.__str__()
+
 @login_required
 def entrances(request, device, days=1):
-    data_dict = defaultdict(dict)
+    data_dict = defaultdict(dict)    
     parameters = AdapterParameters.objects.select_related('id_adapter').filter(
         Q(id_adapter__id_device=device) &
         (Q(parameter_name__icontains = 'Ток') | Q(parameter_name__icontains = 'напряжение'))
@@ -49,14 +50,22 @@ def entrances(request, device, days=1):
     
     records = Records.objects.filter(id_adapter__id_device=device)
     if request.method == 'POST':
-        records_startdate = request.POST.get('date_from')
-        records_maxdate = request.POST.get('date_to')
-    #records_maxdate = Records.objects.filter(id_adapter__id_device=device).aggregate(
-    #                max_date=Max('record_time')
-    #            )['max_date']
-    #records_startdate = records_maxdate - timedelta(days) if records_maxdate else None
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            #date_from = form.cleaned_data['date_from'].isoformat(sep=' ')
+            #date_to = form.cleaned_data['date_to'].isoformat(sep=' ')
+            records_startdate = form.cleaned_data['date_from']
+            records_maxdate = form.cleaned_data['date_to']
+        else:
+            return 
+    else:
+        form = FilterForm()
+        records_maxdate = Records.objects.filter(id_adapter__id_device=device).aggregate(
+                        max_date=Max('record_time')
+                    )['max_date']
+        records_startdate = records_maxdate - timedelta(days) if records_maxdate else None
     #if records_startdate:
-    records = records.filter(record_time__gt=records_startdate, record_time__lt=records_maxdate)
+    records = records.filter(record_time__gte=records_startdate, record_time__lte=records_maxdate)
 
     records = records.values_list('id_record', flat=True)
     _data_id_links = {}
@@ -76,6 +85,8 @@ def entrances(request, device, days=1):
         request,
         'app/entrances.html',        
         {
-            'data': dict(data_dict)
+            'data': dict(data_dict),
+            'form':form,
+            'device': device
         }
     )

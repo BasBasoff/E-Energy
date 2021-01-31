@@ -61,6 +61,7 @@
     <Folder Include="E_Energy\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\scripts\moment-with-locales.js" />
     <Content Include="app\static\app\scripts\script.js">
       <SubType>Code</SubType>
     </Content>

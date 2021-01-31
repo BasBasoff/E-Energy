@@ -3,6 +3,14 @@
 {% block content %}
 
 <h2>{{ device.device_name }}</h2>
+<div class="filter d-block">
+	<form class="form" method="post">
+		{% csrf_token %}
+	    {{ form }}		
+			    
+	    <input type="submit" value="Применить фильтр"/> 
+	</form>
+</div>
 
 <div class="entrances">            
         {% for adapter, param in data.items %}
