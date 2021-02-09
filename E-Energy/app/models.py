@@ -268,7 +268,7 @@ class Versions(models.Model):
 
 class Profile(AbstractBaseUser, models.Model):
     id_pk = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    u_login = models.CharField(unique=True, max_length=30, default='_Login_is_not_provided')
+    u_login = models.CharField(unique=True, max_length=30, default='Login')
     u_password = models.CharField(max_length=100, blank=True, null=True, default='')
     u_role = models.IntegerField(default='2')
     u_name = models.CharField(max_length=150, blank=True, null=True)
@@ -294,3 +294,12 @@ class Profile(AbstractBaseUser, models.Model):
         self.user_auth_id.delete()
         self.user_id_id.delete()
         super(Profile, self).delete(*args, **kwargs)
+
+class Device(models.Model):
+    name = models.CharField(max_length=50)
+    id_devices = models.OneToOneField(Devices, on_delete=models.CASCADE)
+    id_adapters = models.ForeignKey(Adapters, on_delete=models.CASCADE, limit_choices_to=2)
+    direction = models.BooleanField(required=True)
+    def save(self, *args, **kwargs):
+        self.name = Adapters.objects.get(id_adapter=self.id_adapters)
+        super(Device, self).save(*args, **kwargs)
