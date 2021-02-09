@@ -290,16 +290,16 @@ class Profile(AbstractBaseUser, models.Model):
         self.user_id_id = users.id_user
         super(Profile, self).save(*args, **kwargs)
     
-    def delete(self, *args, **kwargs):       
+    def delete(self, *args, **kwargs):
         self.user_auth_id.delete()
         self.user_id_id.delete()
         super(Profile, self).delete(*args, **kwargs)
 
 class Device(models.Model):
     name = models.CharField(max_length=50)
-    id_devices = models.OneToOneField(Devices, on_delete=models.CASCADE)
-    id_adapters = models.ForeignKey(Adapters, on_delete=models.CASCADE, limit_choices_to=2)
-    direction = models.BooleanField(required=True)
+    id_adapters = models.ManyToManyField(Adapters)
+    id_devices = models.ManyToManyField(Devices)
+    direction = models.BooleanField()
     def save(self, *args, **kwargs):
-        self.name = Adapters.objects.get(id_adapter=self.id_adapters)
+        self.name = Adapters.objects.get(id_adapter=self.id_adapters).value('adapter_name')
         super(Device, self).save(*args, **kwargs)

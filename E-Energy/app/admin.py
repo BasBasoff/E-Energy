@@ -7,6 +7,7 @@ from .models import Devices
 from .models import Adapters
 from .models import Records
 from .models import Users
+from .models import Device
 
 @admin.register(Profile)
 class Profile(admin.ModelAdmin):
@@ -17,3 +18,4 @@ admin.site.register(Devices)
 admin.site.register(Adapters)
 admin.site.register(Records)
 admin.site.register(Users)
+admin.site.register(Device)
