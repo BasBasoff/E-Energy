@@ -342,3 +342,4 @@ healthchecksdb
 /env
 /E-Energy/Django3.0
 /E-Energy/env1
+/E-Energy/app/migrations

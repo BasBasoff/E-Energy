@@ -2,13 +2,16 @@
 # You'll have to do the following manually to clean this up:
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
+#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the
+#   desired behavior
+#   * Remove `managed = False` lines if you wish to allow Django to create,
+#   modify, and delete the table
+# Feel free to rename the models, but don't rename db_table values or field
+# names.
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User, AbstractBaseUser
-from django.db.models.signals import pre_delete
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import uuid
 
@@ -51,7 +54,7 @@ class Adapters(models.Model):
     id_adapter = models.AutoField(db_column='ID_ADAPTER', primary_key=True)  # Field name made lowercase.
     id_device = models.ForeignKey('Devices', models.DO_NOTHING, db_column='ID_DEVICE')  # Field name made lowercase.
     adapter_name = models.CharField(db_column='ADAPTER_NAME', max_length=150, blank=True, null=True)  # Field name made lowercase.
-    adapter_description = models.TextField(db_column='ADAPTER_DESCRIPTION', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+    adapter_description = models.TextField(db_column='ADAPTER_DESCRIPTION', blank=True, null=True)  # Field name made lowercase.  This field type is a guess.
     adapter_order = models.SmallIntegerField(db_column='ADAPTER_ORDER')  # Field name made lowercase.
     adapter_logical_id = models.SmallIntegerField(db_column='ADAPTER_LOGICAL_ID')  # Field name made lowercase.
     adapter_type_id = models.IntegerField(db_column='ADAPTER_TYPE_ID')  # Field name made lowercase.
@@ -61,11 +64,14 @@ class Adapters(models.Model):
         managed = False
         db_table = 'adapters'
 
+    def __str__(self):
+        return '{0}: {1}'.format(self.id_adapter, self.adapter_name)
+
 
 class Computers(models.Model):
     id_computer = models.AutoField(db_column='ID_COMPUTER', primary_key=True)  # Field name made lowercase.
     name_computer = models.CharField(db_column='NAME_COMPUTER', max_length=50)  # Field name made lowercase.
-    desc_computer = models.TextField(db_column='DESC_COMPUTER', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+    desc_computer = models.TextField(db_column='DESC_COMPUTER', blank=True, null=True)  # Field name made lowercase.  This field type is a guess.
 
     class Meta:
         managed = False
@@ -115,12 +121,15 @@ class Devices(models.Model):
     device_type = models.IntegerField(db_column='DEVICE_TYPE', blank=True, null=True)  # Field name made lowercase.
     device_type_name = models.CharField(db_column='DEVICE_TYPE_NAME', max_length=200)  # Field name made lowercase.
     device_clsid = models.CharField(db_column='DEVICE_CLSID', max_length=40)  # Field name made lowercase.
-    device_description = models.TextField(db_column='DEVICE_DESCRIPTION', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+    device_description = models.TextField(db_column='DEVICE_DESCRIPTION', blank=True, null=True)  # Field name made lowercase.  This field type is a guess.
     device_data = models.BinaryField(db_column='DEVICE_DATA', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'devices'
+
+    def __str__(self):
+        return '{0}: {1}'.format(self.device_id, self.device_name) 
 
 
 class Groups(models.Model):
@@ -130,8 +139,8 @@ class Groups(models.Model):
     group_type = models.IntegerField(db_column='GROUP_TYPE')  # Field name made lowercase.
     group_order = models.SmallIntegerField(db_column='GROUP_ORDER')  # Field name made lowercase.
     device = models.ForeignKey(Devices, models.DO_NOTHING, db_column='DEVICE_ID', blank=True, null=True)  # Field name made lowercase.
-    group_options = models.TextField(db_column='GROUP_OPTIONS', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-    group_description = models.TextField(db_column='GROUP_DESCRIPTION', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+    group_options = models.TextField(db_column='GROUP_OPTIONS', blank=True, null=True)  # Field name made lowercase.  This field type is a guess.
+    group_description = models.TextField(db_column='GROUP_DESCRIPTION', blank=True, null=True)  # Field name made lowercase.  This field type is a guess.
 
     class Meta:
         managed = False
@@ -249,7 +258,7 @@ class Users(models.Model):
     user_password = models.CharField(db_column='USER_PASSWORD', max_length=30, blank=True, null=True)  # Field name made lowercase.
     user_role = models.IntegerField(db_column='USER_ROLE')  # Field name made lowercase.
     user_name = models.CharField(db_column='USER_NAME', max_length=150, blank=True, null=True)  # Field name made lowercase.
-    user_description = models.TextField(db_column='USER_DESCRIPTION', blank=True, null=True)  # Field name made lowercase. This field type is a guess
+    user_description = models.TextField(db_column='USER_DESCRIPTION', blank=True, null=True)  # Field name made lowercase.  This field type is a guess
 
     class Meta:
         managed = False
@@ -260,7 +269,7 @@ class Versions(models.Model):
     id_version = models.AutoField(db_column='ID_VERSION', primary_key=True)  # Field name made lowercase.
     ver = models.FloatField(db_column='VER', blank=True, null=True)  # Field name made lowercase.
     ver_date = models.DateTimeField(db_column='VER_DATE', blank=True, null=True)  # Field name made lowercase.
-    changes = models.TextField(db_column='CHANGES', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+    changes = models.TextField(db_column='CHANGES', blank=True, null=True)  # Field name made lowercase.  This field type is a guess.
 
     class Meta:
         managed = False
@@ -275,6 +284,9 @@ class Profile(AbstractBaseUser, models.Model):
     user_id = models.OneToOneField(Users, null=True, on_delete = models.CASCADE)
     user_auth = models.OneToOneField(User, on_delete=models.CASCADE)
     id_device = models.ManyToManyField(Devices, null=True)
+
+    USERNAME_FIELD = 'u_login'
+    REQUIRED_FIELD = []
     
     def save(self, *args, **kwargs):
         if not User.objects.filter(username = self.u_login).exists():
@@ -296,10 +308,9 @@ class Profile(AbstractBaseUser, models.Model):
         super(Profile, self).delete(*args, **kwargs)
 
 class Device(models.Model):
-    name = models.CharField(max_length=50)
-    id_adapters = models.ManyToManyField(Adapters)
-    id_devices = models.ManyToManyField(Devices)
-    direction = models.BooleanField()
-    def save(self, *args, **kwargs):
-        self.name = Adapters.objects.get(id_adapter=self.id_adapters).value('adapter_name')
-        super(Device, self).save(*args, **kwargs)
+    adapters = models.ManyToManyField(Adapters, null=True)
+    devices = models.ManyToManyField(Devices, null=True)
+
+    def __str__(self):
+        return '{0}/{1}'.format(self.adapters, self.adapters)
+    

@@ -18,4 +18,6 @@ admin.site.register(Devices)
 admin.site.register(Adapters)
 admin.site.register(Records)
 admin.site.register(Users)
-admin.site.register(Device)
+@admin.register(Device)
+class Device(admin.ModelAdmin):
+	fields = ('adapters', 'devices')
