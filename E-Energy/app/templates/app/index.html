@@ -3,77 +3,76 @@
 {% block content %}
 
 <div class="row">
-	
-		<div class="entrances">
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th rowspan="3" class="text-center">Энерговвод</th>
-						<th rowspan="3" class="text-center">Фактический расход электроэнергии (кВт*ч)</th>
-						<th rowspan="2" class="text-center" colspan="3">Фактическая экономия электроэнергии за текущие сутки</th>
-						<th colspan="6" class="text-center">Ток (А)</th>
-						<th colspan="6" class="text-center">Напряжение (В)</th>
-					</tr>
-					<tr>
-						<th colspan="2" class="text-center">Фаза A</th>
-						<th colspan="2" class="text-center">Фаза B</th>
-						<th colspan="2" class="text-center">Фаза C</th>
-						  			    
-						<th colspan="2" class="text-center">Фаза A</th>
-						<th colspan="2" class="text-center">Фаза B</th>
-						<th colspan="2" class="text-center">Фаза C</th>
-					</tr>
-					<tr>
-						<th scope="col">(кВт*ч)</th>
-						<th scope="col">(руб)</th>
-						<th scope="col">(%)</th>
-								  
-						<th scope="col">Вход</th>
-						<th scope="col">Выход</th>
-						<th scope="col">Вход</th>
-						<th scope="col">Выход</th>
-						<th scope="col">Вход</th>
-						<th scope="col">Выход</th>
-								  
-						<th scope="col">Вход</th>
-						<th scope="col">Выход</th>
-						<th scope="col">Вход</th>
-						<th scope="col">Выход</th>
-						<th scope="col">Вход</th>
-						<th scope="col">Выход</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for device in devices %}
-					<tr>
-						<td>
-							<a href="/entrances/{{device.pk}}">
-								{{device.name}}
-							</a>
-						</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td>{{A_I1}}</td>
-						<td>{{A_I2}}</td>
-						<td>{{B_I1}}</td>
-						<td>{{B_I2}}</td>
-						<td>{{C_I1}}</td>
-						<td>{{C_I1}}</td>
-						<td>{{A_U1}}</td>
-						<td>{{A_U2}}</td>
-						<td>{{B_U1}}</td>
-						<td>{{B_U2}}</td>
-						<td>{{C_U1}}</td>
-						<td>{{C_U2}}</td>
-					</tr>
-					{% empty %}
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	<div-- class="col">		
+	<div class="entrances">
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th rowspan="3" class="text-center">Энерговвод</th>
+					<th rowspan="3" class="text-center">Фактический расход электроэнергии (кВт*ч)</th>
+					<th rowspan="2" class="text-center" colspan="3">Фактическая экономия электроэнергии за текущие сутки</th>
+					<th colspan="6" class="text-center">Ток (А)</th>
+					<th colspan="6" class="text-center">Напряжение (В)</th>
+				</tr>
+				<tr>
+					<th colspan="2" class="text-center">Фаза A</th>
+					<th colspan="2" class="text-center">Фаза B</th>
+					<th colspan="2" class="text-center">Фаза C</th>
+					  			    
+					<th colspan="2" class="text-center">Фаза A</th>
+					<th colspan="2" class="text-center">Фаза B</th>
+					<th colspan="2" class="text-center">Фаза C</th>
+				</tr>
+				<tr>
+					<th scope="col">(кВт*ч)</th>
+					<th scope="col">(руб)</th>
+					<th scope="col">(%)</th>
+							  
+					<th scope="col">Вход</th>
+					<th scope="col">Выход</th>
+					<th scope="col">Вход</th>
+					<th scope="col">Выход</th>
+					<th scope="col">Вход</th>
+					<th scope="col">Выход</th>
+							  
+					<th scope="col">Вход</th>
+					<th scope="col">Выход</th>
+					<th scope="col">Вход</th>
+					<th scope="col">Выход</th>
+					<th scope="col">Вход</th>
+					<th scope="col">Выход</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for pk, name in devices %}
+				<tr>
+					<td>
+						<a href="/entrances/{{pk}}">
+							{{name}}
+						</a>
+					</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>{{values.A_U1}}</td>
+					<td>{{values.A_I2}}</td>
+					<td>{{values.B_I1}}</td>
+					<td>{{values.B_I2}}</td>
+					<td>{{values.C_I1}}</td>
+					<td>{{values.C_I1}}</td>
+					<td>{{values.A_U1}}</td>
+					<td>{{values.A_U2}}</td>
+					<td>{{values.B_U1}}</td>
+					<td>{{values.B_U2}}</td>
+					<td>{{values.C_U1}}</td>
+					<td>{{values.C_U2}}</td>
+				</tr>
+				{% empty %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="col">		
 		<h2>{#Имя компании#}</h2>
 		<div class="filter">
 			<form class="form" action="/">

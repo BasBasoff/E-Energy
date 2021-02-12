@@ -22,64 +22,68 @@ class Round(Func):
 @login_required
 def home(request):
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
+    devices_dict = {}
     #values_list = [1.5, 1.435, 1.330, 2, 1.1, 1.208, 1.7]
     for dev in devices:
-        p_AU1 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 1',
+        p_AU1 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 1',
                                                  id_adapter__adapter_name__icontains = 'вход',
                                                  id_adapter__in = dev.adapters.all())
-        p_BU1 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 2',
+        p_BU1 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 2',
                                                  id_adapter__adapter_name__icontains = 'вход',
                                                  id_adapter__in = dev.adapters.all())
-        p_CU1 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 3',
-                                                 id_adapter__adapter_name__icontains = 'вход',
-                                                 id_adapter__in = dev.adapters.all())
-
-        p_AI1 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 1',
-                                                 id_adapter__adapter_name__icontains = 'вход',
-                                                 id_adapter__in = dev.adapters.all())
-        p_BI1 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 2',
-                                                 id_adapter__adapter_name__icontains = 'вход',
-                                                 id_adapter__in = dev.adapters.all())
-        p_CI1 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 3',
+        p_CU1 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 3',
                                                  id_adapter__adapter_name__icontains = 'вход',
                                                  id_adapter__in = dev.adapters.all())
 
-        p_AU2 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 1',
+        p_AI1 = AdapterParameters.objects.get(parameter_name__contains = 'Ток фазы 1',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_BI1 = AdapterParameters.objects.get(parameter_name__contains = 'Ток фазы 2',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_CI1 = AdapterParameters.objects.get(parameter_name__contains = 'Ток фазы 3',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+
+        p_AU2 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 1',
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
-        p_BU2 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 2',
+        p_BU2 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 2',
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
-        p_CU2 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 3',
+        p_CU2 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 3',
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
 
-        p_AI2 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 1',
+        p_AI2 = AdapterParameters.objects.get(parameter_name__contains = 'Ток фазы 1',
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
-        p_BI2 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 2',
+        p_BI2 = AdapterParameters.objects.get(parameter_name__contains = 'Ток фазы 2',
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
-        p_CI2 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 3',
+        p_CI2 = AdapterParameters.objects.get(parameter_name__contains = 'Ток фазы 3',
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
 
-        A_U1 = Data.objects.filter(id_parameter__in = p_AU1)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        B_U1 = Data.objects.filter(id_parameter__in = p_BU1)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        C_U1 = Data.objects.filter(id_parameter__in = p_CU1)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        A_U1 = Data.objects.filter(id_parameter = p_AU1.pk).last().measure_value
+        B_U1 = Data.objects.filter(id_parameter = p_BU1.pk).last().measure_value
+        C_U1 = Data.objects.filter(id_parameter = p_CU1.pk).last().measure_value
+
+        A_I1 = Data.objects.filter(id_parameter = p_AI1.pk).last().measure_value
+        B_I1 = Data.objects.filter(id_parameter = p_BI1.pk).last().measure_value
+        C_I1 = Data.objects.filter(id_parameter = p_CI1.pk).last().measure_value
+
+        #A_U2 = Data.objects.filter(id_parameter__in = p_AU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        #B_U2 = Data.objects.filter(id_parameter__in = p_BU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        #C_U2 = Data.objects.filter(id_parameter__in = p_CU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        #
+        #A_I2 = Data.objects.filter(id_parameter__in = p_AI2).last().measure_value
+        #B_I2 = Data.objects.filter(id_parameter__in = p_BI2).last().measure_value
+        #C_I2 = Data.objects.filter(id_parameter__in = p_CI2).last().measure_value
         
-        A_I1 = Data.objects.filter(id_parameter__in = p_AI1).last().measure_value
-        B_I1 = Data.objects.filter(id_parameter__in = p_BI1).last().measure_value
-        C_I1 = Data.objects.filter(id_parameter__in = p_CI1).last().measure_value
-
-        A_U2 = Data.objects.filter(id_parameter__in = p_AU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        B_U2 = Data.objects.filter(id_parameter__in = p_BU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        C_U2 = Data.objects.filter(id_parameter__in = p_CU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        
-        A_I2 = Data.objects.filter(id_parameter__in = p_AI2).last().measure_value
-        B_I2 = Data.objects.filter(id_parameter__in = p_BI2).last().measure_value
-        C_I2 = Data.objects.filter(id_parameter__in = p_CI2).last().measure_value
-    
+        devices_dict[dev.pk, dev.name] = {'values':{'A_U1':A_U1, 'A_I1':A_I1, #'A_U2':A_U2, 'A_I2':A_I2, 
+                             'B_U1':B_U1, 'B_I1':B_I1, #'B_U2':B_U2, 'B_I2':B_I2, 
+                             'C_U1':C_U1, 'C_I1':C_I1}} #'C_U2':C_U2, 'C_I2':C_I2}
     if request.method == 'POST':
         form = FilterForm(request.POST)
         if form.is_valid():
@@ -95,23 +99,7 @@ def home(request):
         'app/index.html',
         {
             'title':'Главная',
-            'devices':devices,
-            
-            'A_U1':A_U1,
-            'B_U1':B_U1,
-            'C_U1':C_U1,
-            
-            'A_I1':A_I1,
-            'B_I1':B_I1,
-            'C_I1':C_I1,
-            
-            'A_U2':A_U2,
-            'B_U2':B_U2,
-            'C_U2':C_U2,
-            
-            'A_I2':A_I2,
-            'B_I2':B_I2,
-            'C_I2':C_I2,
+            'devices':devices_dict
         }
     )
 
