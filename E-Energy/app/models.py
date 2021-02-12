@@ -291,7 +291,7 @@ class Profile(AbstractBaseUser, models.Model):
     def save(self, *args, **kwargs):
         if not User.objects.filter(username = self.u_login).exists():
             user_auth = User.objects.create_user(username=self.u_login)
-            user_auth.set_password(u_password)
+            user_auth.set_password(self.u_password)
             user_auth.save()
             users = Users(user_login=self.u_login, user_password=self.u_password, user_role=self.u_role, user_name=self.u_name)
             users.save()
@@ -307,10 +307,14 @@ class Profile(AbstractBaseUser, models.Model):
         self.user_id_id.delete()
         super(Profile, self).delete(*args, **kwargs)
 
+    def __str__(self):
+        return self.u_login
+
 class Device(models.Model):
+    name = models.CharField(max_length=50, default='Adapter')
     adapters = models.ManyToManyField(Adapters, null=True)
     devices = models.ManyToManyField(Devices, null=True)
 
     def __str__(self):
-        return '{0}/{1}'.format(self.adapters, self.adapters)
+        return self.name
     

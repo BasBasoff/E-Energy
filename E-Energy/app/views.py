@@ -9,30 +9,109 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, FilteredRelation, Subquery, F, Prefetch, Count, Max
+from django.db.models import Q, FilteredRelation, Subquery, F, Prefetch, Count, Max, Sum, Avg, Func
 from collections import defaultdict
 
 from .forms import FilterForm
 from .models import *
 
+class Round(Func):
+    function = 'ROUND'
+    template = '%(function)s(%(expressions)s, 2)'
+
 @login_required
 def home(request):
-    """Renders the home page."""
-    devices = Devices.objects.filter(profile__user_auth_id = request.user.id)
-    values_list = [1.5, 1.435, 1.330, 2, 1.1, 1.208, 1.7]
-    values = json.dumps(values_list)
-    if request.method == 'POST':
-        date_from = form.cleaned_data['date_from']
-        date_to = form.cleaned_data['date_to']
+    devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
+    #values_list = [1.5, 1.435, 1.330, 2, 1.1, 1.208, 1.7]
+    for dev in devices:
+        p_AU1 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 1',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_BU1 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 2',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_CU1 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 3',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
 
+        p_AI1 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 1',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_BI1 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 2',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_CI1 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 3',
+                                                 id_adapter__adapter_name__icontains = 'вход',
+                                                 id_adapter__in = dev.adapters.all())
+
+        p_AU2 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 1',
+                                                 id_adapter__adapter_name__icontains = 'выход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_BU2 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 2',
+                                                 id_adapter__adapter_name__icontains = 'выход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_CU2 = AdapterParameters.objects.filter(parameter_name__contains = 'Напряжение фазы 3',
+                                                 id_adapter__adapter_name__icontains = 'выход',
+                                                 id_adapter__in = dev.adapters.all())
+
+        p_AI2 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 1',
+                                                 id_adapter__adapter_name__icontains = 'выход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_BI2 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 2',
+                                                 id_adapter__adapter_name__icontains = 'выход',
+                                                 id_adapter__in = dev.adapters.all())
+        p_CI2 = AdapterParameters.objects.filter(parameter_name__contains = 'Ток фазы 3',
+                                                 id_adapter__adapter_name__icontains = 'выход',
+                                                 id_adapter__in = dev.adapters.all())
+
+        A_U1 = Data.objects.filter(id_parameter__in = p_AU1)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        B_U1 = Data.objects.filter(id_parameter__in = p_BU1)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        C_U1 = Data.objects.filter(id_parameter__in = p_CU1)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        
+        A_I1 = Data.objects.filter(id_parameter__in = p_AI1).last().measure_value
+        B_I1 = Data.objects.filter(id_parameter__in = p_BI1).last().measure_value
+        C_I1 = Data.objects.filter(id_parameter__in = p_CI1).last().measure_value
+
+        A_U2 = Data.objects.filter(id_parameter__in = p_AU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        B_U2 = Data.objects.filter(id_parameter__in = p_BU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        C_U2 = Data.objects.filter(id_parameter__in = p_CU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
+        
+        A_I2 = Data.objects.filter(id_parameter__in = p_AI2).last().measure_value
+        B_I2 = Data.objects.filter(id_parameter__in = p_BI2).last().measure_value
+        C_I2 = Data.objects.filter(id_parameter__in = p_CI2).last().measure_value
+    
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+        else:
+            return
+    else:
+        form = FilterForm()
 
     return render(
         request,
         'app/index.html',
         {
             'title':'Главная',
-            'data':values,
-            'devices':devices
+            'devices':devices,
+            
+            'A_U1':A_U1,
+            'B_U1':B_U1,
+            'C_U1':C_U1,
+            
+            'A_I1':A_I1,
+            'B_I1':B_I1,
+            'C_I1':C_I1,
+            
+            'A_U2':A_U2,
+            'B_U2':B_U2,
+            'C_U2':C_U2,
+            
+            'A_I2':A_I2,
+            'B_I2':B_I2,
+            'C_I2':C_I2,
         }
     )
 
@@ -44,29 +123,26 @@ def myconverter(o):
 def entrances(request, device, days=1):
     data_dict = defaultdict(dict)    
     parameters = AdapterParameters.objects.select_related('id_adapter').filter(
-        Q(id_adapter__id_device=device) &
+        Q(id_adapter__device=device) &
         (Q(parameter_name__icontains = 'Ток') | Q(parameter_name__icontains = 'напряжение'))
     )
     
-    records = Records.objects.filter(id_adapter__id_device=device)
+    records = Records.objects.filter(id_adapter__device=device)
     if request.method == 'POST':
         form = FilterForm(request.POST)
-        if form.is_valid():
-            #date_from = form.cleaned_data['date_from'].isoformat(sep=' ')
-            #date_to = form.cleaned_data['date_to'].isoformat(sep=' ')
+        if form.is_valid():            
             records_startdate = form.cleaned_data['date_from']
             records_maxdate = form.cleaned_data['date_to']
         else:
             return 
     else:
         form = FilterForm()
-        records_maxdate = Records.objects.filter(id_adapter__id_device=device).aggregate(
+        records_maxdate = Records.objects.filter(id_adapter__device=device).aggregate(
                         max_date=Max('record_time')
                     )['max_date']
         records_startdate = records_maxdate - timedelta(days) if records_maxdate else None
-    #if records_startdate:
+    
     records = records.filter(record_time__gte=records_startdate, record_time__lte=records_maxdate)
-
     records = records.values_list('id_record', flat=True)
     _data_id_links = {}
     for p in parameters:

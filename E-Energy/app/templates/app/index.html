@@ -47,26 +47,26 @@
 					{% for device in devices %}
 					<tr>
 						<td>
-							<a href="/entrances/{{device.device_id}}">
-								{{device.device_name}}
+							<a href="/entrances/{{device.pk}}">
+								{{device.name}}
 							</a>
 						</td>
 						<td></td>
 						<td></td>
 						<td></td>
 						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td>{{A_I1}}</td>
+						<td>{{A_I2}}</td>
+						<td>{{B_I1}}</td>
+						<td>{{B_I2}}</td>
+						<td>{{C_I1}}</td>
+						<td>{{C_I1}}</td>
+						<td>{{A_U1}}</td>
+						<td>{{A_U2}}</td>
+						<td>{{B_U1}}</td>
+						<td>{{B_U2}}</td>
+						<td>{{C_U1}}</td>
+						<td>{{C_U2}}</td>
 					</tr>
 					{% empty %}
 					{% endfor %}

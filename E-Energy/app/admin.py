@@ -20,4 +20,4 @@ admin.site.register(Records)
 admin.site.register(Users)
 @admin.register(Device)
 class Device(admin.ModelAdmin):
-	fields = ('adapters', 'devices')
+	fields = ('name', 'adapters', 'devices')
