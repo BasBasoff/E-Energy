@@ -36,7 +36,7 @@
     <Compile Include="app\admin.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\filters.py">
+    <Compile Include="app\templatetags\filters.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\forms.py" />
@@ -54,6 +54,7 @@
   <ItemGroup>
     <Folder Include="app\" />
     <Folder Include="app\migrations\" />
+    <Folder Include="app\templatetags\" />
     <Folder Include="app\static\" />
     <Folder Include="app\static\app\" />
     <Folder Include="app\static\app\content\" />
@@ -103,6 +104,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Interpreter Include="Django 3.0\">
+      <Id>Django 3.0</Id>
+      <Version>3.9</Version>
+      <Description>Django 3.0 (Python 3.9 (32-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X86</Architecture>
+    </Interpreter>
     <Interpreter Include="env3\">
       <Id>env3</Id>
       <Version>3.9</Version>

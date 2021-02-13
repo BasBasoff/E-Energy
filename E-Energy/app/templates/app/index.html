@@ -1,4 +1,5 @@
 {% extends "app/layout.html" %}
+{% load filters %}
 
 {% block content %}
 
@@ -43,29 +44,29 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for pk, name in devices %}
+				{% for device, value in devices.items %}
 				<tr>
 					<td>
-						<a href="/entrances/{{pk}}">
-							{{name}}
+						<a href="/entrances/{{value.pk}}">
+							{{device}}
 						</a>
 					</td>
 					<td></td>
 					<td></td>
 					<td></td>
 					<td></td>
-					<td>{{values.A_U1}}</td>
-					<td>{{values.A_I2}}</td>
-					<td>{{values.B_I1}}</td>
-					<td>{{values.B_I2}}</td>
-					<td>{{values.C_I1}}</td>
-					<td>{{values.C_I1}}</td>
-					<td>{{values.A_U1}}</td>
-					<td>{{values.A_U2}}</td>
-					<td>{{values.B_U1}}</td>
-					<td>{{values.B_U2}}</td>
-					<td>{{values.C_U1}}</td>
-					<td>{{values.C_U2}}</td>
+					<td>{{value.values.A_I1|first}}</td>
+					<td>{{value.values.A_I2|first}}</td>
+					<td>{{value.values.B_I1|first}}</td>
+					<td>{{value.values.B_I2|first}}</td>
+					<td>{{value.values.C_I1|first}}</td>
+					<td>{{value.values.C_I1|first}}</td>
+					<td>{{value.values.A_U1|first}}</td>
+					<td>{{value.values.A_U2|first}}</td>
+					<td>{{value.values.B_U1|first}}</td>
+					<td>{{value.values.B_U2|first}}</td>
+					<td>{{value.values.C_U1|first}}</td>
+					<td>{{value.values.C_U2|first}}</td>
 				</tr>
 				{% empty %}
 				{% endfor %}

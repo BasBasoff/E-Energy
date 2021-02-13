@@ -311,7 +311,7 @@ class Profile(AbstractBaseUser, models.Model):
         return self.u_login
 
 class Device(models.Model):
-    name = models.CharField(max_length=50, default='Adapter')
+    name = models.CharField(max_length=50, default='Adapter', unique=True)
     adapters = models.ManyToManyField(Adapters, null=True)
     devices = models.ManyToManyField(Devices, null=True)
 

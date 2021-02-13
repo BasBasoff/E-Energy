@@ -65,25 +65,22 @@ def home(request):
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
 
-        A_U1 = Data.objects.filter(id_parameter = p_AU1.pk).last().measure_value
-        B_U1 = Data.objects.filter(id_parameter = p_BU1.pk).last().measure_value
-        C_U1 = Data.objects.filter(id_parameter = p_CU1.pk).last().measure_value
-
-        A_I1 = Data.objects.filter(id_parameter = p_AI1.pk).last().measure_value
-        B_I1 = Data.objects.filter(id_parameter = p_BI1.pk).last().measure_value
-        C_I1 = Data.objects.filter(id_parameter = p_CI1.pk).last().measure_value
-
-        #A_U2 = Data.objects.filter(id_parameter__in = p_AU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        #B_U2 = Data.objects.filter(id_parameter__in = p_BU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        #C_U2 = Data.objects.filter(id_parameter__in = p_CU2)[:100].aggregate(avg = Round(Avg('measure_value')))['avg']
-        #
-        #A_I2 = Data.objects.filter(id_parameter__in = p_AI2).last().measure_value
-        #B_I2 = Data.objects.filter(id_parameter__in = p_BI2).last().measure_value
-        #C_I2 = Data.objects.filter(id_parameter__in = p_CI2).last().measure_value
+        A_U1 = Data.objects.filter(id_parameter = p_AU1.pk).values_list('measure_value', flat=True)
+        B_U1 = Data.objects.filter(id_parameter = p_BU1.pk).values_list('measure_value', flat=True)
+        C_U1 = Data.objects.filter(id_parameter = p_CU1.pk).values_list('measure_value', flat=True)
+        A_I1 = Data.objects.filter(id_parameter = p_AI1.pk).values_list('measure_value', flat=True)
+        B_I1 = Data.objects.filter(id_parameter = p_BI1.pk).values_list('measure_value', flat=True)
+        C_I1 = Data.objects.filter(id_parameter = p_CI1.pk).values_list('measure_value', flat=True)
+        A_U2 = Data.objects.filter(id_parameter = p_AU2.pk).values_list('measure_value', flat=True)
+        B_U2 = Data.objects.filter(id_parameter = p_BU2.pk).values_list('measure_value', flat=True)
+        C_U2 = Data.objects.filter(id_parameter = p_CU2.pk).values_list('measure_value', flat=True)
+        A_I2 = Data.objects.filter(id_parameter = p_AI2.pk).values_list('measure_value', flat=True)
+        B_I2 = Data.objects.filter(id_parameter = p_BI2.pk).values_list('measure_value', flat=True)
+        C_I2 = Data.objects.filter(id_parameter = p_CI2.pk).values_list('measure_value', flat=True)
         
-        devices_dict[dev.pk, dev.name] = {'values':{'A_U1':A_U1, 'A_I1':A_I1, #'A_U2':A_U2, 'A_I2':A_I2, 
-                             'B_U1':B_U1, 'B_I1':B_I1, #'B_U2':B_U2, 'B_I2':B_I2, 
-                             'C_U1':C_U1, 'C_I1':C_I1}} #'C_U2':C_U2, 'C_I2':C_I2}
+        devices_dict[dev.name] = {'pk':dev.pk,'values':{'A_U1':A_U1, 'A_I1':A_I1, 'A_U2':A_U2, 'A_I2':A_I2, 
+                                                        'B_U1':B_U1, 'B_I1':B_I1, 'B_U2':B_U2, 'B_I2':B_I2, 
+                                                        'C_U1':C_U1, 'C_I1':C_I1, 'C_U2':C_U2, 'C_I2':C_I2}}
     if request.method == 'POST':
         form = FilterForm(request.POST)
         if form.is_valid():
