@@ -65,18 +65,22 @@ def home(request):
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
 
-        A_U1 = Data.objects.filter(id_parameter = p_AU1.pk).values_list('measure_value', flat=True)
-        B_U1 = Data.objects.filter(id_parameter = p_BU1.pk).values_list('measure_value', flat=True)
-        C_U1 = Data.objects.filter(id_parameter = p_CU1.pk).values_list('measure_value', flat=True)
-        A_I1 = Data.objects.filter(id_parameter = p_AI1.pk).values_list('measure_value', flat=True)
-        B_I1 = Data.objects.filter(id_parameter = p_BI1.pk).values_list('measure_value', flat=True)
-        C_I1 = Data.objects.filter(id_parameter = p_CI1.pk).values_list('measure_value', flat=True)
-        A_U2 = Data.objects.filter(id_parameter = p_AU2.pk).values_list('measure_value', flat=True)
-        B_U2 = Data.objects.filter(id_parameter = p_BU2.pk).values_list('measure_value', flat=True)
-        C_U2 = Data.objects.filter(id_parameter = p_CU2.pk).values_list('measure_value', flat=True)
-        A_I2 = Data.objects.filter(id_parameter = p_AI2.pk).values_list('measure_value', flat=True)
-        B_I2 = Data.objects.filter(id_parameter = p_BI2.pk).values_list('measure_value', flat=True)
-        C_I2 = Data.objects.filter(id_parameter = p_CI2.pk).values_list('measure_value', flat=True)
+        last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).order_by('record_time').last()
+        last_record_out = Records.objects.filter(id_adapter = dev.adapters.last()).order_by('record_time').last()
+
+        A_U1 = Data.objects.get(id_parameter = p_AU1.pk, id_record = last_record_in.pk).measure_value
+        B_U1 = Data.objects.get(id_parameter = p_BU1.pk, id_record = last_record_in.pk).measure_value
+        C_U1 = Data.objects.get(id_parameter = p_CU1.pk, id_record = last_record_in.pk).measure_value
+        A_I1 = Data.objects.get(id_parameter = p_AI1.pk, id_record = last_record_in.pk).measure_value
+        B_I1 = Data.objects.get(id_parameter = p_BI1.pk, id_record = last_record_in.pk).measure_value
+        C_I1 = Data.objects.get(id_parameter = p_CI1.pk, id_record = last_record_in.pk).measure_value
+        
+        A_U2 = Data.objects.get(id_parameter = p_AU2.pk, id_record = last_record_out.pk).measure_value
+        B_U2 = Data.objects.get(id_parameter = p_BU2.pk, id_record = last_record_out.pk).measure_value
+        C_U2 = Data.objects.get(id_parameter = p_CU2.pk, id_record = last_record_out.pk).measure_value
+        A_I2 = Data.objects.get(id_parameter = p_AI2.pk, id_record = last_record_out.pk).measure_value
+        B_I2 = Data.objects.get(id_parameter = p_BI2.pk, id_record = last_record_out.pk).measure_value
+        C_I2 = Data.objects.get(id_parameter = p_CI2.pk, id_record = last_record_out.pk).measure_value
         
         devices_dict[dev.name] = {'pk':dev.pk,'values':{'A_U1':A_U1, 'A_I1':A_I1, 'A_U2':A_U2, 'A_I2':A_I2, 
                                                         'B_U1':B_U1, 'B_I1':B_I1, 'B_U2':B_U2, 'B_I2':B_I2, 
