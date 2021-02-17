@@ -16,16 +16,11 @@
         {% for adapter, param in data.items %}
             <div class="col-12">
                 <h4 class="col-6 font-weight-bold">{{adapter}}</h4>
-                {% for p_name, d in param.items %}
+                {% for p_name, data in param.items %}
                     <p class="text-primary">{{p_name}}</p>                
                     <div class="d-flex chart">                        
-                        <input type="hidden" id="{{adapter}}{{p_name}}" value="{{d}}" />
-						{#
-                        <!--input type="hidden" id="{{adapter}}{{param}}" value="{{dt}}" /-->
-							#}
-                        <div id="{{adapter}}{{p_name}}_chart">
-
-                        </div>
+						<input type="hidden" id="{{adapter}} {{p_name}}" value="{{data}}" />
+                        <canvas id="{{p_name}}"></canvas>
                     </div>    
                 {% empty %}
 				<p>Пусто</p>

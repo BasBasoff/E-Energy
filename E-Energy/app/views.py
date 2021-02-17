@@ -11,6 +11,7 @@ from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, FilteredRelation, Subquery, F, Prefetch, Count, Max, Sum, Avg, Func
 from collections import defaultdict
+from datetime import datetime
 
 from .forms import FilterForm
 from .models import *
@@ -85,6 +86,12 @@ def home(request):
         devices_dict[dev.name] = {'pk':dev.pk,'values':{'A_U1':A_U1, 'A_I1':A_I1, 'A_U2':A_U2, 'A_I2':A_I2, 
                                                         'B_U1':B_U1, 'B_I1':B_I1, 'B_U2':B_U2, 'B_I2':B_I2, 
                                                         'C_U1':C_U1, 'C_I1':C_I1, 'C_U2':C_U2, 'C_I2':C_I2}}
+
+        #p_Power = AdapterParameters.objects.get(parameter_name__contains = 'Полная мощность',
+        #                                        id_adapter__adapter_name__icontains = 'вход',
+        #                                        id_adapter__in = dev.adapters.all())
+        #d_Power = Data.objects.filter(id_parameter = p_Power.pk)
+
     if request.method == 'POST':
         form = FilterForm(request.POST)
         if form.is_valid():
@@ -141,7 +148,7 @@ def entrances(request, device, days=1):
                         .prefetch_related('id_record').values(
         'measure_value', 'id_parameter', 'id_record__record_time', 'id_record__id_adapter'
     ).iterator():
-        _data[d['id_parameter']].append({'y': float(d['measure_value']), 'x': int(d['id_record__record_time'].timestamp())*100})
+        _data[d['id_parameter']].append({'y': float(d['measure_value']), 'x': d['id_record__record_time'].replace(tzinfo=None)})
     t2 = time()
     for k,v in _data.items():
         adapter_name, parameter_name = _data_id_links[k]
