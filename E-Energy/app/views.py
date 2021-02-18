@@ -147,7 +147,7 @@ def entrances(request, device, days=1):
     for d in Data.objects.filter(id_record__in=records, id_parameter__in=parameters.values('id_parameter'))\
                         .prefetch_related('id_record').values(
         'measure_value', 'id_parameter', 'id_record__record_time', 'id_record__id_adapter'
-    ).iterator():
+    ).iterator():        
         _data[d['id_parameter']].append({'y': float(d['measure_value']), 'x': d['id_record__record_time'].replace(tzinfo=None)})
     t2 = time()
     for k,v in _data.items():
