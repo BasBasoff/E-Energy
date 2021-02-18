@@ -83,14 +83,17 @@ def home(request):
         B_I2 = Data.objects.get(id_parameter = p_BI2.pk, id_record = last_record_out.pk).measure_value
         C_I2 = Data.objects.get(id_parameter = p_CI2.pk, id_record = last_record_out.pk).measure_value
         
+        p_Power = AdapterParameters.objects.filter(parameter_name__contains = 'Полная мощность',
+                                                id_adapter__adapter_name__icontains = 'выход',
+                                                id_adapter__in = dev.adapters.all())
+        d_Power = Data.objects.filter(id_parameter__in = p_Power).aggregate(full = Sum('measure_value'))['full']
+
         devices_dict[dev.name] = {'pk':dev.pk,'values':{'A_U1':A_U1, 'A_I1':A_I1, 'A_U2':A_U2, 'A_I2':A_I2, 
                                                         'B_U1':B_U1, 'B_I1':B_I1, 'B_U2':B_U2, 'B_I2':B_I2, 
-                                                        'C_U1':C_U1, 'C_I1':C_I1, 'C_U2':C_U2, 'C_I2':C_I2}}
+                                                        'C_U1':C_U1, 'C_I1':C_I1, 'C_U2':C_U2, 'C_I2':C_I2,
+                                                        'full_power': d_power}}
 
-        #p_Power = AdapterParameters.objects.get(parameter_name__contains = 'Полная мощность',
-        #                                        id_adapter__adapter_name__icontains = 'вход',
-        #                                        id_adapter__in = dev.adapters.all())
-        #d_Power = Data.objects.filter(id_parameter = p_Power.pk)
+
 
     if request.method == 'POST':
         form = FilterForm(request.POST)
