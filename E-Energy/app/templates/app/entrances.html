@@ -6,29 +6,29 @@
 <div class="filter d-block">
 	<form class="form" method="post">
 		{% csrf_token %}
-	    {{ form }}		
-			    
+	    {{ form }}
 	    <input type="submit" value="Применить фильтр"/> 
 	</form>
 </div>
 
-<div class="entrances">            
-        {% for adapter, param in data.items %}
-            <div class="col-12">
-                <h4 class="col-6 font-weight-bold">{{adapter}}</h4>
-                {% for p_name, data in param.items %}
-                    <p class="text-primary">{{p_name}}</p>                
-                    <div class="d-flex chart">                        
-						<input type="hidden" id="{{adapter}} {{p_name}}" value="{{data}}" />
-                        <canvas id="{{p_name}}"></canvas>
-                    </div>    
-                {% empty %}
-				<p>Пусто</p>
-                {% endfor %}
-                    
-            </div>            
-        {% empty %}               
-        {% endfor %}        
+<div class="entrances">
+    {% for adapter, param in data.items %}
+        <h4 class="font-weight-bold">{{adapter}}</h4>
+        <div class="col-12 d-flex">
+            {% for p_name, data in param.items %}
+				{% cycle '<div class="col-6">' '' '' %}
+                <p class="text-primary">{{p_name}}</p>
+                <div class="chart">
+					<input type="hidden" id="{{adapter}} {{p_name}}" value="{{data}}" />
+                    <canvas id="{{p_name}}"></canvas>
+                </div>    
+				{% cycle '' '' '</div>' %}
+            {% empty %}
+			<p>Пусто</p>
+            {% endfor %}				
+        </div>            
+    {% empty %}               
+    {% endfor %}        
 </div>
 
 <div class="modal fade" id="{{param.parameter_name}}_in" tabindex="-1" role="img" aria-hidden="true">
