@@ -16,16 +16,29 @@ from datetime import datetime
 from .forms import FilterForm
 from .models import *
 
-class Round(Func):
-    function = 'ROUND'
-    template = '%(function)s(%(expressions)s, 2)'
-
 @login_required
 def home(request):
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+        else:
+            return
+    else:
+        form = FilterForm()    
+
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
     devices_dict = {}
-    #values_list = [1.5, 1.435, 1.330, 2, 1.1, 1.208, 1.7]
+
+   
     for dev in devices:
+        
+        date_to = Records.objects.filter(id_adapter__device=device).aggregate(
+                        max_date=Max('record_time')
+                    )['max_date']
+        date_from = records_maxdate - timedelta(days) if records_maxdate else None
+
         p_AU1 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 1',
                                                  id_adapter__adapter_name__icontains = 'вход',
                                                  id_adapter__in = dev.adapters.all())
@@ -66,44 +79,41 @@ def home(request):
                                                  id_adapter__adapter_name__icontains = 'выход',
                                                  id_adapter__in = dev.adapters.all())
 
-        last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).order_by('record_time').last()
-        last_record_out = Records.objects.filter(id_adapter = dev.adapters.last()).order_by('record_time').last()
-
-        A_U1 = Data.objects.get(id_parameter = p_AU1.pk, id_record = last_record_in.pk).measure_value
-        B_U1 = Data.objects.get(id_parameter = p_BU1.pk, id_record = last_record_in.pk).measure_value
-        C_U1 = Data.objects.get(id_parameter = p_CU1.pk, id_record = last_record_in.pk).measure_value
-        A_I1 = Data.objects.get(id_parameter = p_AI1.pk, id_record = last_record_in.pk).measure_value
-        B_I1 = Data.objects.get(id_parameter = p_BI1.pk, id_record = last_record_in.pk).measure_value
-        C_I1 = Data.objects.get(id_parameter = p_CI1.pk, id_record = last_record_in.pk).measure_value
+        last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).last()
+        last_record_out = Records.objects.filter(id_adapter = dev.adapters.last()).last()
         
-        A_U2 = Data.objects.get(id_parameter = p_AU2.pk, id_record = last_record_out.pk).measure_value
-        B_U2 = Data.objects.get(id_parameter = p_BU2.pk, id_record = last_record_out.pk).measure_value
-        C_U2 = Data.objects.get(id_parameter = p_CU2.pk, id_record = last_record_out.pk).measure_value
-        A_I2 = Data.objects.get(id_parameter = p_AI2.pk, id_record = last_record_out.pk).measure_value
-        B_I2 = Data.objects.get(id_parameter = p_BI2.pk, id_record = last_record_out.pk).measure_value
-        C_I2 = Data.objects.get(id_parameter = p_CI2.pk, id_record = last_record_out.pk).measure_value
+        #Сбор данных полной мощности
+        #   Вход
+        AU1_query = Data.objects.filter(id_parameter = p_AU1.pk).values_list('measure_value', flat=True)
+        BU1_query = Data.objects.filter(id_parameter = p_BU1.pk).values_list('measure_value', flat=True)
+        CU1_query = Data.objects.filter(id_parameter = p_CU1.pk).values_list('measure_value', flat=True)
+        #   Выход
+        AI1_query = Data.objects.filter(id_parameter = p_AI1.pk).values_list('measure_value', flat=True)
+        BI1_query = Data.objects.filter(id_parameter = p_BI1.pk).values_list('measure_value', flat=True)
+        CI1_query = Data.objects.filter(id_parameter = p_CI1.pk).values_list('measure_value', flat=True)
+        A1_total_power = Sum(x*y for x,y in list(zip(AU1_query, AI1_query)))
+        #Сбор данных напряжения и тока в таблицу
+        #   Вход
+        AU1 = Data.objects.get(id_parameter = p_AU1.pk, id_record = last_record_in.pk).measure_value
+        BU1 = Data.objects.get(id_parameter = p_BU1.pk, id_record = last_record_in.pk).measure_value
+        CU1 = Data.objects.get(id_parameter = p_CU1.pk, id_record = last_record_in.pk).measure_value
+        AI1 = Data.objects.get(id_parameter = p_AI1.pk, id_record = last_record_in.pk).measure_value
+        BI1 = Data.objects.get(id_parameter = p_BI1.pk, id_record = last_record_in.pk).measure_value
+        CI1 = Data.objects.get(id_parameter = p_CI1.pk, id_record = last_record_in.pk).measure_value
+        #   Выход
+        AU2 = Data.objects.get(id_parameter = p_AU2.pk, id_record = last_record_out.pk).measure_value
+        BU2 = Data.objects.get(id_parameter = p_BU2.pk, id_record = last_record_out.pk).measure_value
+        CU2 = Data.objects.get(id_parameter = p_CU2.pk, id_record = last_record_out.pk).measure_value
+        AI2 = Data.objects.get(id_parameter = p_AI2.pk, id_record = last_record_out.pk).measure_value
+        BI2 = Data.objects.get(id_parameter = p_BI2.pk, id_record = last_record_out.pk).measure_value
+        CI2 = Data.objects.get(id_parameter = p_CI2.pk, id_record = last_record_out.pk).measure_value
         
-        p_Power = AdapterParameters.objects.filter(parameter_name__contains = 'Полная мощность',
-                                                id_adapter__adapter_name__icontains = 'выход',
-                                                id_adapter__in = dev.adapters.all())
-        d_Power = Data.objects.filter(id_parameter__in = p_Power).aggregate(full = Sum('measure_value'))['full']
+        devices_dict[dev.name] = {'pk':dev.pk,'values':{'A_U1':AU1, 'A_I1':AI1, 'A_U2':AU2, 'A_I2':AI2, 
+                                                        'B_U1':BU1, 'B_I1':BI1, 'B_U2':BU2, 'B_I2':BI2, 
+                                                        'C_U1':CU1, 'C_I1':CI1, 'C_U2':CU2, 'C_I2':CI2,
+                                                        'A1_total_power': A1_total_power
+                                                        }}
 
-        devices_dict[dev.name] = {'pk':dev.pk,'values':{'A_U1':A_U1, 'A_I1':A_I1, 'A_U2':A_U2, 'A_I2':A_I2, 
-                                                        'B_U1':B_U1, 'B_I1':B_I1, 'B_U2':B_U2, 'B_I2':B_I2, 
-                                                        'C_U1':C_U1, 'C_I1':C_I1, 'C_U2':C_U2, 'C_I2':C_I2,
-                                                        'full_power': d_power}}
-
-
-
-    if request.method == 'POST':
-        form = FilterForm(request.POST)
-        if form.is_valid():
-            date_from = form.cleaned_data['date_from']
-            date_to = form.cleaned_data['date_to']
-        else:
-            return
-    else:
-        form = FilterForm()
 
     return render(
         request,

@@ -34,7 +34,7 @@ $('.chart').each(function () {
 
 	var color;
 	if (cnvs.attr('id').includes('1')) {
-		color = 'red'
+		color = 'orange'
 	} else if (cnvs.attr('id').includes('2')) {
 		color = 'green'
 	} else if (cnvs.attr('id').includes('3')) {
