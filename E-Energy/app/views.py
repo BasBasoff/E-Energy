@@ -37,7 +37,7 @@ def home(request):
         date_to = Records.objects.filter(id_adapter__device=device).aggregate(
                         max_date=Max('record_time')
                     )['max_date']
-        date_from = records_maxdate - timedelta(days) if records_maxdate else None
+        date_from = records_maxdate - timedelta(1) if records_maxdate else None
 
         p_AU1 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 1',
                                                  id_adapter__adapter_name__icontains = 'вход',
@@ -84,7 +84,7 @@ def home(request):
         
         #Сбор данных полной мощности
         #   Вход
-        AU1_query = Data.objects.filter(id_parameter = p_AU1.pk).values_list('measure_value', flat=True)
+        AU1_query = Data.objects.filter(id_parameter = p_AU1.pk, id_record__gte = date_from, id_record__lte = date_to).values_list('measure_value', flat=True)
         BU1_query = Data.objects.filter(id_parameter = p_BU1.pk).values_list('measure_value', flat=True)
         CU1_query = Data.objects.filter(id_parameter = p_CU1.pk).values_list('measure_value', flat=True)
         #   Выход
