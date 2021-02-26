@@ -10,7 +10,7 @@
 				<tr>
 					<th rowspan="3" class="text-center">Энерговвод</th>
 					<th rowspan="3" class="text-center">Фактический расход электроэнергии (кВт*ч)</th>
-					<th rowspan="2" class="text-center" colspan="3">Фактическая экономия электроэнергии за текущие сутки</th>
+					<th rowspan="2" class="text-center" colspan="3">Фактическая экономия электроэнергии</th>
 					<th colspan="6" class="text-center">Ток (А)</th>
 					<th colspan="6" class="text-center">Напряжение (В)</th>
 				</tr>
@@ -43,7 +43,7 @@
 					<th scope="col">Выход</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody id="tbody">
 				{% for device, value in devices.items %}
 				<tr>
 					<td>
@@ -51,16 +51,16 @@
 							{{device}}
 						</a>
 					</td>
-					<td>{{value.values.A1_total_power}}</td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td id="total_power">{{value.values.total_power}}</td>
+					<td id="XP">{{value.values.XP}}</td>
+					<td id="XP_cost" ></td> <!--Устанавливается javascript'ом script.js-->
+					<td id="XP_percent"></td> <!--Устанавливается javascript'ом script.js-->
 					<td>{{value.values.A_I1}}</td>
 					<td>{{value.values.A_I2}}</td>
 					<td>{{value.values.B_I1}}</td>
 					<td>{{value.values.B_I2}}</td>
 					<td>{{value.values.C_I1}}</td>
-					<td>{{value.values.C_I1}}</td>
+					<td>{{value.values.C_I2}}</td>
 					<td>{{value.values.A_U1}}</td>
 					<td>{{value.values.A_U2}}</td>
 					<td>{{value.values.B_U1}}</td>
@@ -87,7 +87,7 @@
 		<div class="header d-flex flex-row justify-content-between">
 			<div class="tarif">
 				<p class="font-weight-bold">Действующий тариф на электроэнергию (руб/кВт*ч)</p>
-				<input class="form-control" type="text" placeholder="{#Значение тарифа#}">
+				<input class="form-control" type="text" id="tarif" placeholder="{#Значение тарифа#}">
 			</div>
 		</div>		
 		<div class="sum">

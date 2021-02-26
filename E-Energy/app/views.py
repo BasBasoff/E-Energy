@@ -18,26 +18,10 @@ from .models import *
 
 @login_required
 def home(request):
-    if request.method == 'POST':
-        form = FilterForm(request.POST)
-        if form.is_valid():
-            date_from = form.cleaned_data['date_from']
-            date_to = form.cleaned_data['date_to']
-        else:
-            return
-    else:
-        form = FilterForm()    
-
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
     devices_dict = {}
 
-   
     for dev in devices:
-        
-        date_to = Records.objects.filter(id_adapter__device=device).aggregate(
-                        max_date=Max('record_time')
-                    )['max_date']
-        date_from = records_maxdate - timedelta(1) if records_maxdate else None
 
         p_AU1 = AdapterParameters.objects.get(parameter_name__contains = 'Напряжение фазы 1',
                                                  id_adapter__adapter_name__icontains = 'вход',
@@ -82,16 +66,53 @@ def home(request):
         last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).last()
         last_record_out = Records.objects.filter(id_adapter = dev.adapters.last()).last()
         
+        if request.method == 'POST':
+            form = FilterForm(request.POST)
+            if form.is_valid():
+                date_from = form.cleaned_data['date_from']                
+                date_to = form.cleaned_data['date_to']                
+            else:
+                return
+        else:
+            form = FilterForm() 
+            date_to = Records.objects.filter(id_adapter = dev.adapters.first()).aggregate(
+                                max_date=Max('record_time')
+                            )['max_date']
+            date_from = date_to - timedelta(1) if date_to else None            
+        
         #Сбор данных полной мощности
         #   Вход
-        AU1_query = Data.objects.filter(id_parameter = p_AU1.pk, id_record__gte = date_from, id_record__lte = date_to).values_list('measure_value', flat=True)
-        BU1_query = Data.objects.filter(id_parameter = p_BU1.pk).values_list('measure_value', flat=True)
-        CU1_query = Data.objects.filter(id_parameter = p_CU1.pk).values_list('measure_value', flat=True)
+        AU1_query = Data.objects.filter(id_parameter = p_AU1.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        BU1_query = Data.objects.filter(id_parameter = p_BU1.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        CU1_query = Data.objects.filter(id_parameter = p_CU1.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        AI1_query = Data.objects.filter(id_parameter = p_AI1.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        BI1_query = Data.objects.filter(id_parameter = p_BI1.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        CI1_query = Data.objects.filter(id_parameter = p_CI1.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
         #   Выход
-        AI1_query = Data.objects.filter(id_parameter = p_AI1.pk).values_list('measure_value', flat=True)
-        BI1_query = Data.objects.filter(id_parameter = p_BI1.pk).values_list('measure_value', flat=True)
-        CI1_query = Data.objects.filter(id_parameter = p_CI1.pk).values_list('measure_value', flat=True)
-        A1_total_power = Sum(x*y for x,y in list(zip(AU1_query, AI1_query)))
+        AU2_query = Data.objects.filter(id_parameter = p_AU2.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        BU2_query = Data.objects.filter(id_parameter = p_BU2.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        CU2_query = Data.objects.filter(id_parameter = p_CU2.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        AI2_query = Data.objects.filter(id_parameter = p_AI2.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        BI2_query = Data.objects.filter(id_parameter = p_BI2.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        CI2_query = Data.objects.filter(id_parameter = p_CI2.pk, id_record__record_time__gte = date_from, id_record__record_time__lte = date_to).values_list('measure_value', flat=True)
+        #   Суммирование произведений напряжения и тока
+        A_power = sum(x*y*0.92 for x,y in zip(AU1_query, AI1_query))
+        B_power = sum(x*y*0.92 for x,y in zip(BU1_query, BI1_query))
+        C_power = sum(x*y*0.92 for x,y in zip(CU1_query, CI1_query))
+        total_power = float("{0:.3f}".format(sum([A_power, B_power, C_power]))) #Суммирование и округление до третьего знака
+        #Рассчёт экономии
+        x1 = sum(x*y*0.92 for x,y in zip(AI1_query, AU2_query))
+        x2 = sum(x*y*0.92 for x,y in zip(AI2_query, AU1_query))
+        x3 = sum(x*y*0.92 for x,y in zip(BI1_query, BU2_query)) 
+        x4 = sum(x*y*0.92 for x,y in zip(BI2_query, BU1_query))
+        x5 = sum(x*y*0.92 for x,y in zip(CI1_query, CU2_query))
+        x6 = sum(x*y*0.92 for x,y in zip(CI2_query, CU2_query)) 
+        x0 = sum([x1, x3, x5])
+        x8 = sum([x2, x4, x6])
+        XH = x0/x8*100
+        XP = 100-XH #Экономия в Квт*ч        
+        #XP_cost = XP
+        #XP_percent
         #Сбор данных напряжения и тока в таблицу
         #   Вход
         AU1 = Data.objects.get(id_parameter = p_AU1.pk, id_record = last_record_in.pk).measure_value
@@ -111,7 +132,8 @@ def home(request):
         devices_dict[dev.name] = {'pk':dev.pk,'values':{'A_U1':AU1, 'A_I1':AI1, 'A_U2':AU2, 'A_I2':AI2, 
                                                         'B_U1':BU1, 'B_I1':BI1, 'B_U2':BU2, 'B_I2':BI2, 
                                                         'C_U1':CU1, 'C_I1':CI1, 'C_U2':CU2, 'C_I2':CI2,
-                                                        'A1_total_power': A1_total_power
+                                                        'total_power': total_power,
+                                                        'XP': XP, #'XP_cost':XP_cost, 'XP_percent':XP_percent
                                                         }}
 
 
