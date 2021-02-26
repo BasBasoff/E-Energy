@@ -99,7 +99,7 @@ def home(request):
         A_power = sum(x*y*0.92 for x,y in zip(AU1_query, AI1_query))
         B_power = sum(x*y*0.92 for x,y in zip(BU1_query, BI1_query))
         C_power = sum(x*y*0.92 for x,y in zip(CU1_query, CI1_query))
-        total_power = float("{0:.3f}".format(sum([A_power, B_power, C_power]))) #Суммирование и округление до третьего знака
+        total_power = "{0:.3f}".format(float(sum([A_power, B_power, C_power]))/60) #Суммирование и округление до третьего знака
         #Рассчёт экономии
         x1 = sum(x*y*0.92 for x,y in zip(AI1_query, AU2_query))
         x2 = sum(x*y*0.92 for x,y in zip(AI2_query, AU1_query))
@@ -110,7 +110,7 @@ def home(request):
         x0 = sum([x1, x3, x5])
         x8 = sum([x2, x4, x6])
         XH = x0/x8*100
-        XP = 100-XH #Экономия в Квт*ч        
+        XP = float("{0:.3f}".format(100-XH)) #Экономия в Квт*ч        
         #XP_cost = XP
         #XP_percent
         #Сбор данных напряжения и тока в таблицу
@@ -142,6 +142,7 @@ def home(request):
         'app/index.html',
         {
             'title':'Главная',
+            'form': form,
             'devices':devices_dict
         }
     )
