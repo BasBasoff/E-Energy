@@ -76,13 +76,11 @@
 	<div class="col">		
 		<h2>{#Имя компании#}</h2>
 		<div class="filter">
-			<form class="form" action="/">
-			    <label for="date_from">Начало периода</label>
-			    <input type="datetime-local" class="form-control" id="date_from" >
-			    <label for="date_to">Начало периода</label>
-			    <input type="datetime-local" class="form-control" id="date_to" >
-			    <input type="submit" value="Применить фильтр"/> 
-			</form>
+			<form class="form" method="post">
+			{% csrf_token %}
+		    {{ form }}
+		    <input type="submit" value="Применить фильтр"/> 
+		</form>
 		</div>
 		<div class="header d-flex flex-row justify-content-between">
 			<div class="tarif">

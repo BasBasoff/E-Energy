@@ -90,7 +90,6 @@ class Data(models.Model):
         unique_together = (('id_record', 'id_parameter'),)
 
 
-
 class DataCur(models.Model):
     id_adapter = models.OneToOneField('RecordsCur', models.DO_NOTHING, db_column='ID_ADAPTER', primary_key=True)  # Field name made lowercase.
     id_parameter = models.IntegerField(db_column='ID_PARAMETER')  # Field name made lowercase.
