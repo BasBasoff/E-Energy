@@ -63,7 +63,7 @@ $('.chart').each(function () {
 
 tarif.onchange = function () {
 	for (str of tbody.children) {
-		str.children['XP_cost'].innerHTML = tarif.value * str.children['XP'].innerHTML
-		str.children['XP_percent'].innerHTML = (str.children['XP_cost'].innerHTML / (str.children['XP'].innerHTML*tarif.value))*100
+		str.children['XP_cost'].innerHTML = (tarif.value * str.children['XP'].innerHTML).toFixed(3)
+		str.children['XP_percent'].innerHTML = ((str.children['XP_cost'].innerHTML / (str.children['XP'].innerHTML*tarif.value))*100).toFixed(3)
     }
 }
