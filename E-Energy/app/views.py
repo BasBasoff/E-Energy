@@ -188,8 +188,8 @@ def home(request):
         #x4 = sum(x*y*0.92 for x,y in zip(BI2_query, BU1_query))
         #x5 = sum(x*y*0.92 for x,y in zip(CI1_query, CU2_query))
         #x6 = sum(x*y*0.92 for x,y in zip(CI2_query, CU2_query))
-        x0 = sum([Params_by_hour.x1, Params_by_hour.x3, Params_by_hour.x5])
-        x8 = sum([Params_by_hour.x2, Params_by_hour.x4, Params_by_hour.x6])
+        x0 = sum([sum(Params_by_hour.values_list('x1', flat=True)), sum(Params_by_hour.values_list('x3', flat=True)), sum(Params_by_hour.values_list('x5', flat=True))])
+        x8 = sum([sum(Params_by_hour.values_list('x2', flat=True)), sum(Params_by_hour.values_list('x4', flat=True)), sum(Params_by_hour.values_list('x6', flat=True))])
         XH = x0/x8*100
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч        
         
