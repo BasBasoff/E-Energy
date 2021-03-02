@@ -1,5 +1,4 @@
 {% extends "app/layout.html" %}
-{% load filters %}
 
 {% block content %}
 
@@ -98,7 +97,7 @@
 				<li>
 					<p class="font-weight-bold">За период (кВт*ч)</p>
 					<p class="text-muted">
-						{#Расход за указанный период#} 
+						{#Расход за указанный период#}
 					</p>
 				</li>
 				<li>
@@ -118,7 +117,7 @@
 
 		<div class="d-flex flex-column">
 			<div class="ct-chart ct-perfect-fourth chart" id="chart">
-				<input type="hidden" id="chart_values" value="{{data}}"/>
+				<input type="hidden" id="economy" value="{{power_array}}"/>
 				<canvas></canvas> 
 			</div>			
 		</div>
