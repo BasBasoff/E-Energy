@@ -90,6 +90,15 @@ class Data(models.Model):
         unique_together = (('id_record', 'id_parameter'),)
 
 
+class CachingData(models.Model):
+    record = models.ForeignKey('Records', to_field='id_record', on_delete=models.CASCADE)
+    adapter = models.ForeignKey('Adapters', to_field='id_adapter', on_delete=models.SET_NULL)
+    parameter = models.ForeignKey('AdapterParameters', to_field='id_parameter', on_delete=models.SET_NULL)
+    record_time = models.DateTimeField(null=True, blank=True)
+    param_value = models.FloatField(null=True, blank=True)
+    measure_value = models.FloatField(null=True, blank=True)
+
+
 class DataCur(models.Model):
     id_adapter = models.OneToOneField('RecordsCur', models.DO_NOTHING, db_column='ID_ADAPTER', primary_key=True)  # Field name made lowercase.
     id_parameter = models.IntegerField(db_column='ID_PARAMETER')  # Field name made lowercase.
@@ -128,7 +137,7 @@ class Devices(models.Model):
         db_table = 'devices'
 
     def __str__(self):
-        return '{0}: {1}'.format(self.device_id, self.device_name) 
+        return '{0}: {1}'.format(self.device_id, self.device_name)
 
 
 class Groups(models.Model):
@@ -286,7 +295,7 @@ class Profile(AbstractBaseUser, models.Model):
 
     USERNAME_FIELD = 'u_login'
     REQUIRED_FIELD = []
-    
+
     def save(self, *args, **kwargs):
         if not User.objects.filter(username = self.u_login).exists():
             user_auth = User.objects.create_user(username=self.u_login)
@@ -300,7 +309,7 @@ class Profile(AbstractBaseUser, models.Model):
         self.user_auth_id = user_auth.id
         self.user_id_id = users.id_user
         super(Profile, self).save(*args, **kwargs)
-    
+
     def delete(self, *args, **kwargs):
         self.user_auth_id.delete()
         self.user_id_id.delete()
@@ -316,4 +325,3 @@ class Device(models.Model):
 
     def __str__(self):
         return self.name
-    

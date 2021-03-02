@@ -87,7 +87,7 @@ DATABASES = {
         'USER': 'bassist',
         'PASSWORD':'bassist',
         'OPTIONS':{
-            'driver':'ODBC Driver 17 for SQL Server'            
+            'driver':'ODBC Driver 17 for SQL Server'
             }
     },
 }
@@ -124,3 +124,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
 
 LOGIN_URL = 'login/'
+
+#Redis
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visiblity_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
