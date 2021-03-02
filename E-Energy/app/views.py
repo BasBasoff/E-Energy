@@ -145,7 +145,7 @@ def home(request):
         #    .annotate(data_date = Trunc('id_record__record_time', segmentation))\
         #    .values('data_date')\
         #    .annotate(avg_data=Avg('measure_value')).values_list('avg_data', flat=True)
-        Params_by_hour = Data.objects.filter(
+        Params_by_hour = list(Data.objects.filter(
         id_record__record_time__gte = date_from,
         id_record__record_time__lte = date_to)\
             .annotate(
@@ -172,15 +172,15 @@ def home(request):
                 x4=Avg('measure_value', filter=Q(id_parameter = p_BI2.pk))*Avg('measure_value', filter=Q(id_parameter = p_BU1.pk))*0.93,
                 x5=Avg('measure_value', filter=Q(id_parameter = p_CI1.pk))*Avg('measure_value', filter=Q(id_parameter = p_CU2.pk))*0.93,
                 x6=Avg('measure_value', filter=Q(id_parameter = p_CI2.pk))*Avg('measure_value', filter=Q(id_parameter = p_CU1.pk))*0.93,
-            )
+            ))
         #par_list = list(Params_by_hour)
         #   Суммирование произведений напряжения и тока
         #A_power = sum(x*y*0.92 for x,y in zip(AU1_query, AI1_query))
         #B_power = sum(x*y*0.92 for x,y in zip(BU1_query, BI1_query))
         #C_power = sum(x*y*0.92 for x,y in zip(CU1_query, CI1_query))
-        total_power = "{0:.3f}".format(sum([sum(Params_by_hour.values_list('A_power', flat=True)), 
-                                                  sum(Params_by_hour.values_list('B_power', flat=True)), 
-                                                  sum(Params_by_hour.values_list('C_power', flat=True))])) #Суммирование и округление до третьего знака
+        total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour), 
+                                                  sum(_['B_power'] for _ in Params_by_hour), 
+                                                  sum(_['C_power'] for _ in Params_by_hour)])) #Суммирование и округление до третьего знака
         #Рассчёт экономии
         #x1 = sum(x*y*0.92 for x,y in zip(AI1_query, AU2_query))
         #x2 = sum(x*y*0.92 for x,y in zip(AI2_query, AU1_query))
@@ -188,8 +188,8 @@ def home(request):
         #x4 = sum(x*y*0.92 for x,y in zip(BI2_query, BU1_query))
         #x5 = sum(x*y*0.92 for x,y in zip(CI1_query, CU2_query))
         #x6 = sum(x*y*0.92 for x,y in zip(CI2_query, CU2_query))
-        x0 = sum([sum(Params_by_hour.values_list('x1', flat=True)), sum(Params_by_hour.values_list('x3', flat=True)), sum(Params_by_hour.values_list('x5', flat=True))])
-        x8 = sum([sum(Params_by_hour.values_list('x2', flat=True)), sum(Params_by_hour.values_list('x4', flat=True)), sum(Params_by_hour.values_list('x6', flat=True))])
+        x0 = sum([sum(_['x1'] for _ in Params_by_hour), sum(_['x3'] for _ in Params_by_hour), sum(_['x5'] for _ in Params_by_hour)])
+        x8 = sum([sum(_['x2'] for _ in Params_by_hour), sum(_['x4'] for _ in Params_by_hour), sum(_['x6'] for _ in Params_by_hour)])
         XH = x0/x8*100
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч        
         
