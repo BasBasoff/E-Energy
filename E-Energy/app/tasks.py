@@ -10,7 +10,7 @@ def data_caching():
     except AttributeError:
         last_caching_record = Records(record_time=datetime(2000, 1,1,0,1))
 
-    new_record_instances = Records.filter(
+    new_record_instances = Records.objects.filter(
         record_time__gt=last_caching_record.record_time
     )
 
