@@ -16,7 +16,7 @@ def data_caching():
 
     for record_instance in new_record_instances.iterator():
         new_data_instances = list(
-            Data.objects.filter(id_record=instance.id_record)
+            Data.objects.filter(id_record=record_instance.id_record)
         )
 
         CachingData.objects.bulk_create(
