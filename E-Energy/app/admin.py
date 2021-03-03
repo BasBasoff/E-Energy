@@ -8,6 +8,7 @@ from .models import Adapters
 from .models import Records
 from .models import Users
 from .models import Device
+from .models import CachingData
 
 @admin.register(Profile)
 class Profile(admin.ModelAdmin):
@@ -18,6 +19,7 @@ admin.site.register(Devices)
 admin.site.register(Adapters)
 admin.site.register(Records)
 admin.site.register(Users)
+admin.site.register(CachingData)
 @admin.register(Device)
 class Device(admin.ModelAdmin):
 	fields = ('name', 'adapters', 'devices')
