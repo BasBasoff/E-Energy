@@ -21,7 +21,7 @@ def data_caching():
 
         CachingData.objects.bulk_create(
             [
-                Entry(
+                CachingData(
                     record_time=record_instance.record_time,
                     adapter_id=record_instance.id_adapter,
                     **data_instance
