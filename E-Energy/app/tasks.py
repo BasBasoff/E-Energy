@@ -1,5 +1,5 @@
 from E_Energy.celeryapp import app
-from Models import CachingData, Data, AdapterParameters, Records
+from .models import CachingData, Data, AdapterParameters, Records
 
 
 @app.task
