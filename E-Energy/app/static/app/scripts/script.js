@@ -1,6 +1,7 @@
 $('.chart').each(function () {
 	var cnvs = $(this).children('canvas');
 	var i = $(this).children('input');
+	
 	i = i[0] ? i[0].value : '';
 	var data = {};
 
@@ -59,6 +60,55 @@ $('.chart').each(function () {
 			}
 		}
 	})
+})
+
+var cnvs = $('.economy-chart').children('canvas');
+$('.economy-chart').children('input').each(function () {
+	var i = i[0] ? i[0].value.values.total_power : '';
+
+})
+var data = {};
+try {
+	data.values = JSON.parse(i).map(function (d) {
+		return d.y
+	}).sort(		
+		function (a, b) {
+			return a.x > b.x ? 1 : -1;
+		}
+	)
+	data.labels = JSON.parse(i).map(function (d) { return moment(new Date(d.x)).format("DD/MM/YY HH:mm") })
+}
+catch (e) { console.error(e) }
+var chart = new Chart(cnvs, {
+	type: 'line',
+	data: {
+		labels: data.labels,
+		datasets: [{
+			label: cnvs.attr('id'),
+			data: data.values,
+			borderColor: color,
+			fill: false,
+			radius: 0
+		}]
+	},
+	options: {
+		scales: {
+			xAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Date time'
+				}
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Value'
+				}
+			}]
+		}
+	}
 })
 
 tarif.onchange = function () {

@@ -155,10 +155,7 @@ def home(request):
                                                         'power_array': power_array
                                                         }
                                   }
-    #for i in devices_dict:
-    #    for y in i['values']['power_array']:
-    #        result += y
-    #    full_power_array
+    
 
     return render(
         request,
