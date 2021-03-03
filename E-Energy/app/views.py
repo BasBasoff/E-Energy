@@ -21,6 +21,7 @@ from .models import *
 def home(request):
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
     devices_dict = {}
+    power_dict = []
 
     for dev in devices:
         params_list = []
@@ -115,12 +116,13 @@ def home(request):
         total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour),
                                             sum(_['B_power'] for _ in Params_by_hour),
                                             sum(_['C_power'] for _ in Params_by_hour)])) #Суммирование и округление до третьего знака
-        power_array = []
+        power_list = []
         for i in Params_by_hour:
             A = i['A_power']
             B = i['B_power']
             C = i['C_power']
-            power_array.append(sum([A,B,C]))
+            power_list.append(sum([A,B,C]))
+        power_dict.append(json.dumps(power_list))
 
         #Рассчёт экономии
         x0 = sum([sum(_['x1'] for _ in Params_by_hour), sum(_['x3'] for _ in Params_by_hour), sum(_['x5'] for _ in Params_by_hour)])
@@ -151,8 +153,7 @@ def home(request):
                                                         'B_U1':BU1, 'B_I1':BI1, 'B_U2':BU2, 'B_I2':BI2,
                                                         'C_U1':CU1, 'C_I1':CI1, 'C_U2':CU2, 'C_I2':CI2,
                                                         'total_power': total_power,
-                                                        'XP': XP,
-                                                        'power_array': power_array
+                                                        'XP': XP                                                        
                                                         }
                                   }
     
@@ -161,10 +162,10 @@ def home(request):
         request,
         'app/index.html',
         {
-            'title':'Главная',
+            'title':'KF-Energy',
             'form': form,
             'devices':devices_dict,
-            #'power_array': full_power_array
+            'power_array': power_dict
         }
     )
 

@@ -291,7 +291,7 @@ class Profile(AbstractBaseUser, models.Model):
     u_name = models.CharField(max_length=150, blank=True, null=True)
     user_id = models.OneToOneField(Users, null=True, on_delete = models.CASCADE)
     user_auth = models.OneToOneField(User, on_delete=models.CASCADE)
-    id_device = models.ManyToManyField(Devices, null=True)
+    id_device = models.ManyToManyField(Devices)
 
     USERNAME_FIELD = 'u_login'
     REQUIRED_FIELD = []
@@ -320,8 +320,8 @@ class Profile(AbstractBaseUser, models.Model):
 
 class Device(models.Model):
     name = models.CharField(max_length=50, default='Adapter', unique=True)
-    adapters = models.ManyToManyField(Adapters, null=True)
-    devices = models.ManyToManyField(Devices, null=True)
+    adapters = models.ManyToManyField(Adapters)
+    devices = models.ManyToManyField(Devices)
 
     def __str__(self):
         return self.name
