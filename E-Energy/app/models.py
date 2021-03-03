@@ -92,8 +92,8 @@ class Data(models.Model):
 
 class CachingData(models.Model):
     record = models.ForeignKey('Records', to_field='id_record', on_delete=models.CASCADE)
-    adapter = models.ForeignKey('Adapters', to_field='id_adapter', on_delete=models.SET_NULL)
-    parameter = models.ForeignKey('AdapterParameters', to_field='id_parameter', on_delete=models.SET_NULL)
+    adapter = models.ForeignKey('Adapters', to_field='id_adapter', null=True, on_delete=models.SET_NULL)
+    parameter = models.ForeignKey('AdapterParameters', to_field='id_parameter', null=True,on_delete=models.SET_NULL)
     record_time = models.DateTimeField(null=True, blank=True)
     param_value = models.FloatField(null=True, blank=True)
     measure_value = models.FloatField(null=True, blank=True)

@@ -6,7 +6,7 @@
     <RootNamespace>E-Energy</RootNamespace>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
-    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|Django 3.0|$(MSBuildProjectFullPath)</InterpreterId>
     <SuppressPackageInstallationPrompt>True</SuppressPackageInstallationPrompt>
   </PropertyGroup>
   <PropertyGroup>
