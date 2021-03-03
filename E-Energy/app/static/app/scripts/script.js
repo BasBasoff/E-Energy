@@ -71,8 +71,7 @@ var data = {};
 try {
 	data.values = JSON.parse(i).map(function (d) {
 		return d.y
-	}).sort(
-		//data = [JSON.parse(i).map(function (d) { return { x: moment(new Date(d.x)).format("DD/MM/YY HH:mm"), y: d.y } }).sort(
+	}).sort(		
 		function (a, b) {
 			return a.x > b.x ? 1 : -1;
 		}
