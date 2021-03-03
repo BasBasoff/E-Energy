@@ -14,6 +14,6 @@ app.conf.timezone = 'UTC'
 app.conf.beat_schedule = {
     'every-hour': {
         'task': 'app.tasks.data_caching',
-        'schedule': crontab(minute=0, hour='*/1')
+        'schedule': crontab(minute='*/1', hour='*/1')
     },
 }
