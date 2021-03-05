@@ -75,11 +75,12 @@ try {
 }
 catch (e) { console.error(e) }
 
-var even = 0;
-var odd = 0;
+
 var x8 = [];
 var x0 = [];
 for (j = 0; j < parsed[0].length; j++) {
+	var even = 0;
+	var odd = 0;
 	for (i = 0; i < parsed.length; i++) {
 		if (i % 2 == 0) {
 			even += parsed[i][j];
@@ -92,13 +93,13 @@ for (j = 0; j < parsed[0].length; j++) {
 	x8.push(even);
 }
 for (i in x0) {
-	data.values.push(((x0[i] / x8[0]) * 100) - 100);
+	data.values.push(((x0[i] / x8[i]) * 100) - 100);
 }
 
 var chart = new Chart(cnvs, {
 	type: 'line',
 	data: {
-		//labels: parsed['datetime'],
+		labels: parsed[6],
 		datasets: [{			
 			label: "Economy",
 			data: data.values,
@@ -107,15 +108,8 @@ var chart = new Chart(cnvs, {
 			radius: 0
 		}]
 	},
-	options: {
-		scales: {
-			xAxes: [{
-				display: true,				
-			}],
-			yAxes: [{
-				display: true,				
-			}]
-		}
+	options: {		
+		lineTension: 0
 	}
 })
 

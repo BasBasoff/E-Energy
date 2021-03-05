@@ -21,7 +21,7 @@ from .models import *
 def home(request):
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
     devices_dict = {}
-    power_dict = {}
+    power_dict = []
 
     for dev in devices:
         params_list = []
@@ -112,14 +112,16 @@ def home(request):
             )
         Params_by_hour_list = list(Params_by_hour)
         
-        #   Суммирование мощности по фазам        
+        #   Суммирование мощности по фазам
         total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour_list),
                                             sum(_['B_power'] for _ in Params_by_hour_list),
                                             sum(_['C_power'] for _ in Params_by_hour_list)])) #Суммирование и округление до третьего знака
         power_list = []        
         for i in ['x1','x2','x3','x4','x5','x6']:
             power_list.append(list(Params_by_hour.values_list(i, flat=True)))
-        datetime_list = (_.replace(tzinfo=None) for _ in list(Params_by_hour.values_list('data_date', flat=True)))
+        date_list = list(_.replace(tzinfo=None) for _ in list(Params_by_hour.values_list('data_date', flat=True)))
+        power_list.append(date_list)
+        
         #Рассчёт экономии
         x0 = sum([sum(_['x1'] for _ in Params_by_hour_list), sum(_['x3'] for _ in Params_by_hour_list), sum(_['x5'] for _ in Params_by_hour_list)])
         x8 = sum([sum(_['x2'] for _ in Params_by_hour_list), sum(_['x4'] for _ in Params_by_hour_list), sum(_['x6'] for _ in Params_by_hour_list)])
@@ -153,9 +155,7 @@ def home(request):
                                                         }
                                   }
     
-    power_dict['vals'] = power_list
-    power_dict['labs'] = datetime_list
-    power_dict = json.dumps(power_dict)
+    power_dict = json.dumps(power_list)
     return render(
         request,
         'app/index.html',
