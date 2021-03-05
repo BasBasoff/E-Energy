@@ -91,10 +91,10 @@ class Data(models.Model):
 
 
 class CachingData(models.Model):
-    record_id = models.IntegerField(blank=True, null=True)
-    adapter_id = models.IntegerField(blank=True, null=True)
-    parameter_id = models.IntegerField(blank=True, null=True)
-    record_time = models.DateTimeField(null=True, blank=True)
+    record_id = models.IntegerField(blank=True, null=True, db_index=True)
+    adapter_id = models.IntegerField(blank=True, null=True, db_index=True)
+    parameter_id = models.IntegerField(blank=True, null=True, db_index=True)
+    record_time = models.DateTimeField(null=True, blank=True, db_index=True)
     param_value = models.FloatField(null=True, blank=True)
     measure_value = models.FloatField(null=True, blank=True)
 

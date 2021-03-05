@@ -21,7 +21,6 @@ from .models import *
 def home(request):
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
     devices_dict = {}
-    power_dict = []
 
     for dev in devices:
         params_list = []
@@ -75,40 +74,42 @@ def home(request):
                 return
         else:
             form = FilterForm() 
-            date_to = Records.objects.filter(id_adapter = dev.adapters.first()).aggregate(
+            date_to = CachingData.objects.filter(adapter_id = dev.adapters.last().id_adapter).aggregate(
                                 max_date=Max('record_time')
                             )['max_date']
+            if date_to is None:
+                continue
             date_from = date_to - timedelta(1) if date_to else None
         
         segmentation = 'hour'        
         
-        Params_by_hour = Data.objects.filter(
-        id_record__record_time__gte = date_from,
-        id_record__record_time__lte = date_to)\
+        Params_by_hour = list(CachingData.objects.filter(
+        record_time__gte = date_from,
+        record_time__lte = date_to)\
             .annotate(
-                data_date = Trunc('id_record__record_time', 'hour'),
+                data_date = Trunc('record_time', 'hour'),
             ).values('data_date').annotate(
-                p_AU1=Avg('measure_value', filter=Q(id_parameter = p_AU1.pk)),
-                p_AI1=Avg('measure_value', filter=Q(id_parameter = p_AI1.pk)),
-                p_BU1=Avg('measure_value', filter=Q(id_parameter = p_BU1.pk)),
-                p_BI1=Avg('measure_value', filter=Q(id_parameter = p_BI1.pk)),
-                p_CU1=Avg('measure_value', filter=Q(id_parameter = p_CU1.pk)),
-                p_CI1=Avg('measure_value', filter=Q(id_parameter = p_CI1.pk)),
-                p_AU2=Avg('measure_value', filter=Q(id_parameter = p_AU2.pk)),
-                p_AI2=Avg('measure_value', filter=Q(id_parameter = p_AI2.pk)),
-                p_BU2=Avg('measure_value', filter=Q(id_parameter = p_BU2.pk)),
-                p_BI2=Avg('measure_value', filter=Q(id_parameter = p_BI2.pk)),
-                p_CU2=Avg('measure_value', filter=Q(id_parameter = p_CU2.pk)),
-                p_CI2=Avg('measure_value', filter=Q(id_parameter = p_CI2.pk)),
-                A_power=Avg('measure_value', filter=Q(id_parameter = p_AU1.pk))*Avg('measure_value', filter=Q(id_parameter = p_AI1.pk))*0.93,
-                B_power=Avg('measure_value', filter=Q(id_parameter = p_BU1.pk))*Avg('measure_value', filter=Q(id_parameter = p_BI1.pk))*0.93,
-                C_power=Avg('measure_value', filter=Q(id_parameter = p_CU1.pk))*Avg('measure_value', filter=Q(id_parameter = p_CI1.pk))*0.93,
-                x1=Avg('measure_value', filter=Q(id_parameter = p_AI1.pk))*Avg('measure_value', filter=Q(id_parameter = p_AU2.pk))*0.93,
-                x2=Avg('measure_value', filter=Q(id_parameter = p_AI2.pk))*Avg('measure_value', filter=Q(id_parameter = p_AU1.pk))*0.93,
-                x3=Avg('measure_value', filter=Q(id_parameter = p_BI1.pk))*Avg('measure_value', filter=Q(id_parameter = p_BU2.pk))*0.93,
-                x4=Avg('measure_value', filter=Q(id_parameter = p_BI2.pk))*Avg('measure_value', filter=Q(id_parameter = p_BU1.pk))*0.93,
-                x5=Avg('measure_value', filter=Q(id_parameter = p_CI1.pk))*Avg('measure_value', filter=Q(id_parameter = p_CU2.pk))*0.93,
-                x6=Avg('measure_value', filter=Q(id_parameter = p_CI2.pk))*Avg('measure_value', filter=Q(id_parameter = p_CU1.pk))*0.93,
+                p_AU1=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk)),
+                p_AI1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk)),
+                p_BU1=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk)),
+                p_BI1=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk)),
+                p_CU1=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk)),
+                p_CI1=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk)),
+                p_AU2=Avg('measure_value', filter=Q(parameter_id = p_AU2.pk)),
+                p_AI2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk)),
+                p_BU2=Avg('measure_value', filter=Q(parameter_id = p_BU2.pk)),
+                p_BI2=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk)),
+                p_CU2=Avg('measure_value', filter=Q(parameter_id = p_CU2.pk)),
+                p_CI2=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk)),
+                A_power=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93,
+                B_power=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93,
+                C_power=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
+                x1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU2.pk))*0.93,
+                x2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*0.93,
+                x3=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU2.pk))*0.93,
+                x4=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*0.93,
+                x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
+                x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
             )
         Params_by_hour_list = list(Params_by_hour)
         
@@ -122,10 +123,22 @@ def home(request):
         date_list = list(_.replace(tzinfo=None) for _ in list(Params_by_hour.values_list('data_date', flat=True)))
         power_list.append(date_list)
         
+        #   Суммирование мощности по фазам        
+        total_power = "{0:.3f}".format(sum([sum( _['A_power'] or 0 for _ in Params_by_hour),
+                                            sum( _['B_power'] or 0 for _ in Params_by_hour),
+                                            sum( _['C_power'] or 0 for _ in Params_by_hour)])) #Суммирование и округление до третьего знака
+        power_array = []
+        for i in Params_by_hour:
+            A = i['A_power'] or 0
+            B = i['B_power'] or 0
+            C = i['C_power'] or 0
+            power_array.append(sum([A,B,C]))
+
         #Рассчёт экономии
-        x0 = sum([sum(_['x1'] for _ in Params_by_hour_list), sum(_['x3'] for _ in Params_by_hour_list), sum(_['x5'] for _ in Params_by_hour_list)])
-        x8 = sum([sum(_['x2'] for _ in Params_by_hour_list), sum(_['x4'] for _ in Params_by_hour_list), sum(_['x6'] for _ in Params_by_hour_list)])
-        XH = x0/x8*100
+        x0 = sum([sum(_['x1'] or 0 for _ in Params_by_hour), sum(_['x3'] or 0 for _ in Params_by_hour), sum(_['x5'] or 0 for _ in Params_by_hour)])
+        x8 = sum([sum(_['x2'] or 0 for _ in Params_by_hour), sum(_['x4'] or 0 for _ in Params_by_hour), sum(_['x6'] or 0 for _ in Params_by_hour)])
+        XH = x0/x8*100 if x8 != 0 else 0
+
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
         
         #Сбор данных напряжения и тока в таблицу
@@ -151,7 +164,8 @@ def home(request):
                                                         'B_U1':BU1, 'B_I1':BI1, 'B_U2':BU2, 'B_I2':BI2,
                                                         'C_U1':CU1, 'C_I1':CI1, 'C_U2':CU2, 'C_I2':CI2,
                                                         'total_power': total_power,
-                                                        'XP': XP                                                        
+                                                        'XP': XP,
+                                                        'power_array': power_array
                                                         }
                                   }
     
@@ -160,10 +174,10 @@ def home(request):
         request,
         'app/index.html',
         {
-            'title':'KF-Energy',
+            'title':'Главная',
             'form': form,
             'devices':devices_dict,
-            'power_array': power_dict
+            #'power_array': full_power_array
         }
     )
 
