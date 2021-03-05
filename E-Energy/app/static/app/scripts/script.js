@@ -19,8 +19,7 @@ $('.chart').each(function () {
 	try {
 		data.values = JSON.parse(i).map(function (d) {
 			return d.y
-		}).sort(
-			//data = [JSON.parse(i).map(function (d) { return { x: moment(new Date(d.x)).format("DD/MM/YY HH:mm"), y: d.y } }).sort(
+		}).sort(			
 			function (a, b) {
 				return a.x > b.x ? 1 : -1;
 			}
@@ -64,51 +63,53 @@ $('.chart').each(function () {
 
 var cnvs = $('.economy-chart').children('canvas');
 var inp = $('.economy-chart').children('input');
-var tarif = 
+var tar = tarif.value
 inp = inp[0] ? inp[0].value : '';
-inp = inp.replace(/\'/g, '\"');
 
 var data = {
-	values: []
+	values: [],
+	labels: []
 };
 try {
-	parsed = JSON.parse(inp)[0]	
-	for (item = 0; item < parsed.length; item++) {
-		data.values[item] = JSON.parse(parsed[item])
-    }
+	parsed = JSON.parse(inp)	
 }
 catch (e) { console.error(e) }
 
-var summ = 0;
-var result = [];
-for (i = 0; i < data.values[0].length; i++) {
-	for (j = 0; j < data.values.length; j++) {
-		summ += data.values[j][i];
+
+var x8 = [];
+var x0 = [];
+for (j = 0; j < parsed[0].length; j++) {
+	var even = 0;
+	var odd = 0;
+	for (i = 0; i < parsed.length; i++) {
+		if (i % 2 == 0) {
+			even += parsed[i][j];
+		}
+		else {
+			odd += parsed[i][j];
+        }
 	}
-	result.push(summ);
+	x0.push(odd);
+	x8.push(even);
+}
+for (i in x0) {
+	data.values.push(((x0[i] / x8[i]) * 100) - 100);
 }
 
 var chart = new Chart(cnvs, {
 	type: 'line',
 	data: {
-		//labels: data.labels,
+		labels: parsed[6],
 		datasets: [{			
-			label: "Ёкономи€",
-			data: result,
+			label: "Economy",
+			data: data.values,
 			borderColor: 'orange',
 			fill: false,
 			radius: 0
 		}]
 	},
-	options: {
-		scales: {
-			xAxes: [{
-				display: true,				
-			}],
-			yAxes: [{
-				display: true,				
-			}]
-		}
+	options: {		
+		lineTension: 0
 	}
 })
 

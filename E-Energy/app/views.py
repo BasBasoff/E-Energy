@@ -111,7 +111,17 @@ def home(request):
                 x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
                 x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
             )
-        )
+        Params_by_hour_list = list(Params_by_hour)
+        
+        #   Суммирование мощности по фазам
+        total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour_list),
+                                            sum(_['B_power'] for _ in Params_by_hour_list),
+                                            sum(_['C_power'] for _ in Params_by_hour_list)])) #Суммирование и округление до третьего знака
+        power_list = []        
+        for i in ['x1','x2','x3','x4','x5','x6']:
+            power_list.append(list(Params_by_hour.values_list(i, flat=True)))
+        date_list = list(_.replace(tzinfo=None) for _ in list(Params_by_hour.values_list('data_date', flat=True)))
+        power_list.append(date_list)
         
         #   Суммирование мощности по фазам        
         total_power = "{0:.3f}".format(sum([sum( _['A_power'] or 0 for _ in Params_by_hour),
@@ -128,6 +138,7 @@ def home(request):
         x0 = sum([sum(_['x1'] or 0 for _ in Params_by_hour), sum(_['x3'] or 0 for _ in Params_by_hour), sum(_['x5'] or 0 for _ in Params_by_hour)])
         x8 = sum([sum(_['x2'] or 0 for _ in Params_by_hour), sum(_['x4'] or 0 for _ in Params_by_hour), sum(_['x6'] or 0 for _ in Params_by_hour)])
         XH = x0/x8*100 if x8 != 0 else 0
+
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
         
         #Сбор данных напряжения и тока в таблицу
@@ -158,7 +169,7 @@ def home(request):
                                                         }
                                   }
     
-
+    power_dict = json.dumps(power_list)
     return render(
         request,
         'app/index.html',
