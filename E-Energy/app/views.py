@@ -88,7 +88,7 @@ def home(request):
         id_record__record_time__gte = date_from,
         id_record__record_time__lte = date_to)\
             .annotate(
-                data_date = Trunc('id_record__record_time', 'hour'),
+                data_date = Trunc('id_record__record_time', segmentation),
             ).values('data_date').annotate(
                 p_AU1=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk)),
                 p_AI1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk)),
@@ -118,11 +118,6 @@ def home(request):
         total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour_list),
                                             sum(_['B_power'] for _ in Params_by_hour_list),
                                             sum(_['C_power'] for _ in Params_by_hour_list)])) #Суммирование и округление до третьего знака
-        power_dict = {}
-        for el in Params_by_hour_list:
-            X0 = sum([el['x1'], el['x3'], el['x5']])
-            X8 = sum([el['x2'], el['x4'], el['x6']])
-            power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(X0/X8*100))
                  
         #Рассчёт экономии
         x0 = sum([sum(_['x1'] or 0 for _ in Params_by_hour), sum(_['x3'] or 0 for _ in Params_by_hour), sum(_['x5'] or 0 for _ in Params_by_hour)])
@@ -130,7 +125,13 @@ def home(request):
         XH = x0/x8*100 if x8 != 0 else 0
 
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
-        
+        #Подготовка данных для графика экономии
+        power_dict = {}
+        for el in Params_by_hour_list:
+            _X0 = sum([el['x1'], el['x3'], el['x5']])
+            _X8 = sum([el['x2'], el['x4'], el['x6']])
+            power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(_X0/_X8*100))
+
         #Сбор данных напряжения и тока в таблицу
         #   Вход
         last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).last()

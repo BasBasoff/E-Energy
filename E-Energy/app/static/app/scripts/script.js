@@ -75,9 +75,8 @@ try {
 }
 catch (e) { console.error(e) }
 
-var arr = [];
-for (i in parsed) {
-	data.labels.push(i)
+for (d in parsed) {
+	data.labels.push(d)
 }
 data.labels.sort()
 for (d of data.labels) {
