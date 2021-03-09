@@ -24,10 +24,8 @@ def home(request):
     power_dict = []
 
     for dev in devices:
-        params_list = []
-		
+        params_list = []		
         dev_adapters_params = AdapterParameters.objects.filter(id_adapter__in = dev.adapters.all()).select_related('id_adapter')
-		
         p_AU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 1',
                                         id_adapter__adapter_name__icontains = 'вход',
                                         )
@@ -113,7 +111,7 @@ def home(request):
                 x4=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*0.93,
                 x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
                 x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
-            ))
+            )
         
         
         #   Суммирование мощности по фазам
@@ -136,7 +134,6 @@ def home(request):
         #Сбор данных напряжения и тока в таблицу
         #   Вход
         last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).last()
-		
         last_datas = list(Data.objects.filter(id_record = last_record_in.pk))
         AU1 = next((item.measure_value for item in last_datas if item.id_parameter==p_AU1.pk), 0)
         BU1 = next((item.measure_value for item in last_datas if item.id_parameter==p_BU1.pk), 0)
@@ -161,8 +158,7 @@ def home(request):
         CU2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CU2.pk), 0)
         AI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_AI2.pk), 0)
         BI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_BI2.pk), 0)
-        CI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CI2.pk), 0)
-		
+        CI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CI2.pk), 0)		
 		#AU2 = Data.objects.get(id_parameter = p_AU2.pk, id_record = last_record_out.pk).measure_value
         #BU2 = Data.objects.get(id_parameter = p_BU2.pk, id_record = last_record_out.pk).measure_value
         #CU2 = Data.objects.get(id_parameter = p_CU2.pk, id_record = last_record_out.pk).measure_value
