@@ -75,37 +75,27 @@ try {
 }
 catch (e) { console.error(e) }
 
-
-var x8 = [];
-var x0 = [];
-for (j = 0; j < parsed[0].length; j++) {
-	var even = 0;
-	var odd = 0;
-	for (i = 0; i < parsed.length; i++) {
-		if (i % 2 == 0) {
-			even += parsed[i][j];
-		}
-		else {
-			odd += parsed[i][j];
-        }
-	}
-	x0.push(odd);
-	x8.push(even);
+var arr = [];
+for (i in parsed) {
+	data.labels.push(i)
 }
-for (i in x0) {
-	data.values.push(((x0[i] / x8[i]) * 100) - 100);
+data.labels.sort()
+for (d of data.labels) {
+	data.values.push(parsed[d])
 }
 
 var chart = new Chart(cnvs, {
 	type: 'line',
 	data: {
-		labels: parsed[6],
+		labels: data.labels,
 		datasets: [{			
 			label: "Economy",
 			data: data.values,
 			borderColor: 'orange',
 			fill: false,
-			radius: 0
+			radius: 1,
+			hitRadius: 7,
+			hoverRadius: 5
 		}]
 	},
 	options: {		
