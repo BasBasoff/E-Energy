@@ -20,8 +20,9 @@ from .models import *
 @login_required
 def home(request):
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
+    form = FilterForm()
     devices_dict = {}
-    power_dict = []
+    power_dict = {}
 
     for dev in devices:
         params_list = []		
@@ -112,7 +113,7 @@ def home(request):
                 x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
                 x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
             )
-        
+        Params_by_hour_list = list(Params_by_hour)
         
         #   Суммирование мощности по фазам
         total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour_list),
@@ -126,7 +127,6 @@ def home(request):
 
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
         #Подготовка данных для графика экономии
-        power_dict = {}
         for el in Params_by_hour_list:
             _X0 = sum([el['x1'], el['x3'], el['x5']])
             _X8 = sum([el['x2'], el['x4'], el['x6']])
@@ -175,7 +175,8 @@ def home(request):
                                                         'XP': XP,                                                        
                                                         }
                                   }    
-    power_list = json.dumps(power_dict)
+    power_json = []
+    power_json = json.dumps(power_dict)
     return render(
         request,
         'app/index.html',
@@ -183,7 +184,7 @@ def home(request):
             'title':'KF-Energy',
             'form': form,
             'devices':devices_dict,
-            'power_array': power_list
+            'power_array': power_json
         }
     )
 

@@ -86,6 +86,7 @@ DATABASES = {
         'HOST': 'localhost',
         'USER': 'bassist',
         'PASSWORD':'bassist',
+        #ox^pCaZzx8
         'OPTIONS':{
             'driver':'ODBC Driver 17 for SQL Server'
             }
