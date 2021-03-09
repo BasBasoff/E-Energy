@@ -72,9 +72,11 @@ def home(request):
                 return
         else:
             form = FilterForm() 
-            date_to = Records.objects.filter(id_adapter = dev.adapters.first()).aggregate(
+            date_to = CachingData.objects.filter(adapter_id = dev.adapters.last().id_adapter).aggregate(
                                 max_date=Max('record_time')
                             )['max_date']
+            if date_to is None:
+                continue
             date_from = date_to - timedelta(1) if date_to else None
         
         segmentation = 'hour'        
@@ -120,9 +122,10 @@ def home(request):
             power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(X0/X8*100))
                  
         #Рассчёт экономии
-        x0 = sum([sum(_['x1'] for _ in Params_by_hour_list), sum(_['x3'] for _ in Params_by_hour_list), sum(_['x5'] for _ in Params_by_hour_list)])
-        x8 = sum([sum(_['x2'] for _ in Params_by_hour_list), sum(_['x4'] for _ in Params_by_hour_list), sum(_['x6'] for _ in Params_by_hour_list)])
-        XH = x0/x8*100
+        x0 = sum([sum(_['x1'] or 0 for _ in Params_by_hour), sum(_['x3'] or 0 for _ in Params_by_hour), sum(_['x5'] or 0 for _ in Params_by_hour)])
+        x8 = sum([sum(_['x2'] or 0 for _ in Params_by_hour), sum(_['x4'] or 0 for _ in Params_by_hour), sum(_['x6'] or 0 for _ in Params_by_hour)])
+        XH = x0/x8*100 if x8 != 0 else 0
+
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
         
         #Сбор данных напряжения и тока в таблицу
@@ -148,7 +151,8 @@ def home(request):
                                                         'B_U1':BU1, 'B_I1':BI1, 'B_U2':BU2, 'B_I2':BI2,
                                                         'C_U1':CU1, 'C_I1':CI1, 'C_U2':CU2, 'C_I2':CI2,
                                                         'total_power': total_power,
-                                                        'XP': XP                                                        
+                                                        'XP': XP,
+                                                        'power_array': power_array
                                                         }
                                   }    
     power_list = json.dumps(power_dict)
@@ -156,7 +160,7 @@ def home(request):
         request,
         'app/index.html',
         {
-            'title':'KF-Energy',
+            'title':'Главная',
             'form': form,
             'devices':devices_dict,
             'power_array': power_list
