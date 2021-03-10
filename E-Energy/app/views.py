@@ -107,7 +107,7 @@ def home(request):
                 #B_power=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93,
                 #C_power=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
                 total_power = Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93 +
-                              Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93 +  
+                              Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93 +
                               Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
                 x1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU2.pk))*0.93,
                 x2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*0.93,
@@ -118,7 +118,7 @@ def home(request):
             )
         Params_by_hour_list = list(Params_by_hour)
         
-        #   Суммирование мощности по фазам                 
+        #   Суммирование мощности по фазам
         total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list]))#Суммирование и округление до третьего знака
         #Рассчёт экономии
         x0 = sum([_['x1'] + _['x3'] + _['x5'] or 0 for _ in Params_by_hour_list])
@@ -193,14 +193,9 @@ def myconverter(o):
         return o.__str__()
 
 @login_required
-def entrances(request, device, days=1):
-    data_dict = defaultdict(dict)    
-    parameters = AdapterParameters.objects.select_related('id_adapter').filter(
-        Q(id_adapter__device=device) &
-        (Q(parameter_name__icontains = 'Ток') | Q(parameter_name__icontains = 'напряжение'))
-    )
-    
-    records = Records.objects.filter(id_adapter__device=device)
+def entrances(request, device):
+    data_dict = defaultdict(dict)  
+    form = FilterForm()
     if request.method == 'POST':
         form = FilterForm(request.POST)
         if form.is_valid():            
@@ -213,19 +208,31 @@ def entrances(request, device, days=1):
         records_maxdate = Records.objects.filter(id_adapter__device=device).aggregate(
                         max_date=Max('record_time')
                     )['max_date']
-        records_startdate = records_maxdate - timedelta(days) if records_maxdate else None
+        records_startdate = records_maxdate - timedelta(1) if records_maxdate else None
     
-    records = records.filter(record_time__gte=records_startdate, record_time__lte=records_maxdate)
-    records = records.values_list('id_record', flat=True)
+    #records = Records.objects.filter(id_adapter__device=device, 
+    #                                 record_time__gte=records_startdate, 
+    #                                 record_time__lte=records_maxdate).values_list('id_record', flat=True)        
     _data_id_links = {}
+    parameters = AdapterParameters.objects.select_related('id_adapter').filter(
+        Q(id_adapter__device=device) &
+        (Q(parameter_name__icontains = 'Ток') | Q(parameter_name__icontains = 'Напряжение'))
+    )
     for p in parameters:
         _data_id_links[p.id_parameter] = p.id_adapter.adapter_name, p.parameter_name
     _data = defaultdict(list)
-    for d in Data.objects.filter(id_record__in=records, id_parameter__in=parameters.values('id_parameter'))\
-                        .prefetch_related('id_record').values(
-        'measure_value', 'id_parameter', 'id_record__record_time', 'id_record__id_adapter'
-    ).iterator():        
-        _data[d['id_parameter']].append({'y': float(d['measure_value']), 'x': d['id_record__record_time'].replace(tzinfo=None)})
+    segmentation = 'hour'
+    data_query = Data.objects.filter(
+                            id_record__id_adapter__device=device, 
+                            id_record__record_time__gte=records_startdate, 
+                            id_record__record_time__lte=records_maxdate,
+                            id_parameter__in=parameters.values('id_parameter'))\
+                        .annotate(data_date=Trunc('id_record__record_time', segmentation))\
+                        .prefetch_related('id_record')\
+                        .values('id_parameter', 'data_date', 'id_record__id_adapter')\
+                        .annotate(measure_value=Avg('measure_value'))
+    for d in data_query.iterator():        
+        _data[d['id_parameter']].append({'y': float(d['measure_value']), 'x': d['data_date'].replace(tzinfo=None)})
     t2 = time()
     for k,v in _data.items():
         adapter_name, parameter_name = _data_id_links[k]
