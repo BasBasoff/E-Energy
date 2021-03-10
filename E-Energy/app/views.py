@@ -116,9 +116,10 @@ def home(request):
         Params_by_hour_list = list(Params_by_hour)
         
         #   Суммирование мощности по фазам
-        total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour_list),
-                                            sum(_['B_power'] for _ in Params_by_hour_list),
-                                            sum(_['C_power'] for _ in Params_by_hour_list)])) #Суммирование и округление до третьего знака
+        #total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour_list),
+        #                                    sum(_['B_power'] for _ in Params_by_hour_list),
+        #                                    sum(_['C_power'] for _ in Params_by_hour_list)])) 
+        total_power = "{0:.3f}".format(sum([_['A_power'] +_['B_power'] +_['C_power'] for _ in Params_by_hour_list]))#Суммирование и округление до третьего знака
                  
         #Рассчёт экономии
         x0 = sum([sum(_['x1'] or 0 for _ in Params_by_hour), sum(_['x3'] or 0 for _ in Params_by_hour), sum(_['x5'] or 0 for _ in Params_by_hour)])
