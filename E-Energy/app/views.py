@@ -85,11 +85,11 @@ def home(request):
         
         segmentation = 'hour'        
         
-        Params_by_hour = Data.objects.filter(
-        id_record__record_time__gte = date_from,
-        id_record__record_time__lte = date_to)\
+        Params_by_hour = CachingData.objects.filter(
+        record_time__gte = date_from,
+        record_time__lte = date_to)\
             .annotate(
-                data_date = Trunc('id_record__record_time', segmentation),
+                data_date = Trunc('record_time', segmentation),
             ).values('data_date').annotate(
                 p_AU1=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk)),
                 p_AI1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk)),

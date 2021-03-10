@@ -96,7 +96,7 @@ class CachingData(models.Model):
     parameter_id = models.IntegerField(blank=True, null=True, db_index=True)
     record_time = models.DateTimeField(null=True, blank=True, db_index=True)
     param_value = models.FloatField(null=True, blank=True)
-    measure_value = models.FloatField(null=True, blank=True)
+    measure_value = models.FloatField(null=True, blank=True)    
 
 
 class DataCur(models.Model):
