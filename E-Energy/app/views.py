@@ -103,9 +103,12 @@ def home(request):
                 p_BI2=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk)),
                 p_CU2=Avg('measure_value', filter=Q(parameter_id = p_CU2.pk)),
                 p_CI2=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk)),
-                A_power=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93,
-                B_power=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93,
-                C_power=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
+                #A_power=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93,
+                #B_power=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93,
+                #C_power=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
+                total_power = Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93 +
+                              Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93 +  
+                              Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
                 x1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU2.pk))*0.93,
                 x2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*0.93,
                 x3=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU2.pk))*0.93,
@@ -115,15 +118,11 @@ def home(request):
             )
         Params_by_hour_list = list(Params_by_hour)
         
-        #   Суммирование мощности по фазам
-        #total_power = "{0:.3f}".format(sum([sum(_['A_power'] for _ in Params_by_hour_list),
-        #                                    sum(_['B_power'] for _ in Params_by_hour_list),
-        #                                    sum(_['C_power'] for _ in Params_by_hour_list)])) 
-        total_power = "{0:.3f}".format(sum([_['A_power'] +_['B_power'] +_['C_power'] for _ in Params_by_hour_list]))#Суммирование и округление до третьего знака
-                 
+        #   Суммирование мощности по фазам                 
+        total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list]))#Суммирование и округление до третьего знака
         #Рассчёт экономии
-        x0 = sum([sum(_['x1'] or 0 for _ in Params_by_hour), sum(_['x3'] or 0 for _ in Params_by_hour), sum(_['x5'] or 0 for _ in Params_by_hour)])
-        x8 = sum([sum(_['x2'] or 0 for _ in Params_by_hour), sum(_['x4'] or 0 for _ in Params_by_hour), sum(_['x6'] or 0 for _ in Params_by_hour)])
+        x0 = sum([_['x1'] + _['x3'] + _['x5'] or 0 for _ in Params_by_hour_list])
+        x8 = sum([_['x2'] + _['x4'] + _['x6'] or 0 for _ in Params_by_hour_list])
         XH = x0/x8*100 if x8 != 0 else 0
 
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
