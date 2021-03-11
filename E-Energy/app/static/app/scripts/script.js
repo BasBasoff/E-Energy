@@ -1,7 +1,6 @@
 $('.chart').each(function () {
 	var cnvs = $(this).children('canvas');
-	var i = $(this).children('input');
-	
+	var i = $(this).children('input');	
 	i = i[0] ? i[0].value : '';
 	var data = {};
 
@@ -38,8 +37,8 @@ $('.chart').each(function () {
 				borderColor: color,
 				fill: false,
 				radius: 0,
-				hitRadius: 7,
-				hoverRadius: 5
+				hitRadius: 3,
+				hoverRadius: 3
 			}]
 		},
 		options: {
@@ -57,7 +56,6 @@ $('.chart').each(function () {
 
 var cnvs = $('.economy-chart').children('canvas');
 var inp = $('.economy-chart').children('input');
-var tar = tarif.value
 inp = inp[0] ? inp[0].value : '';
 
 var data = {
@@ -96,9 +94,11 @@ var chart = new Chart(cnvs, {
 	}
 })
 
-tarif.onchange = function () {
-	for (str of tbody.children) {
-		str.children['XP_cost'].innerHTML = (tarif.value * str.children['XP'].innerHTML).toFixed(3)
-		str.children['XP_percent'].innerHTML = ((str.children['XP_cost'].innerHTML / (str.children['total_power'].innerHTML*tarif.value))*100).toFixed(3)
-    }
+if (tarif) {
+	tarif.onchange = function () {
+		for (str of tbody.children) {
+			str.children['XP_cost'].innerHTML = (tarif.value * str.children['XP'].innerHTML).toFixed(3)
+			str.children['XP_percent'].innerHTML = ((str.children['XP_cost'].innerHTML / (str.children['total_power'].innerHTML*tarif.value))*100).toFixed(3)
+	    }
+	}
 }

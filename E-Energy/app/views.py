@@ -196,16 +196,19 @@ def entrances(request, device):
     for p in parameters:
         _data_id_links[p.id_parameter] = p.id_adapter.adapter_name, p.parameter_name
     _data = defaultdict(list)
-    if records_maxdate - records_startdate <= timedelta(days=1):
+    if records_maxdate - records_startdate <= timedelta(hours=3):
         segmentation = 'minute'
-    elif (records_maxdate - records_startdate > timedelta(days=1)) & (records_maxdate - records_startdate <= timedelta(days=15)):  
+    elif (records_maxdate - records_startdate > timedelta(hours=3)) & (records_maxdate - records_startdate <= timedelta(days=7)):  
         segmentation = 'hour'
-    elif (records_maxdate - records_startdate > timedelta(days=15)) & (records_maxdate - records_startdate <= timedelta(weeks=28)):
+    elif (records_maxdate - records_startdate > timedelta(days=7)) & (records_maxdate - records_startdate <= timedelta(weeks=14)):
         segmentation = 'day'
-    elif (records_maxdate - records_startdate > timedelta(weeks=28)) & (records_maxdate - records_startdate <= timedelta(weeks=28*15)):
-        segmentation = 'quarter'
-    else:
+    elif (records_maxdate - records_startdate > timedelta(weeks=14)) & (records_maxdate - records_startdate <= timedelta(weeks=28*3)):
+        segmentation = 'week'
+    elif (records_maxdate - records_startdate > timedelta(weeks=28*3)) & (records_maxdate - records_startdate <= timedelta(weeks=28*15)):
         segmentation = 'month'
+    else:
+        segmentation = 'year'
+
 
     data_query = Data.objects.filter(
                             id_record__id_adapter__device=device, 
