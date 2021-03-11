@@ -94,7 +94,7 @@ def records_caching():
         output_datas = list(
             Data.objects.filter(id_record=output_record.id_record)
         )
-        print(f'output_datas count:{len(ouyput_datas)}')
+        print(f'output_datas count:{len(output_datas)}')
 
         input_params = AdapterParameters.objects.filter(
             id_adapter = input_record.id_adapter_id)
