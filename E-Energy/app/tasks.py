@@ -64,8 +64,7 @@ def records_caching():
         id_adapter__adapter_name__icontains='вход'
     ).order_by('record_time')
 
-    for input_record in new_input_records:
-
+    for input_record in new_input_records.iterator(chunk_size=200):
         p_AU1=0
         p_BU1=0
         p_CU1=0
