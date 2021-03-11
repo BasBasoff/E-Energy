@@ -8,13 +8,13 @@ from django.core.exceptions import ObjectDoesNotExist
 def preparation_dict(instance):
     dict = model_to_dict(instance)
     dict['record_id'] = dict.pop('id_record')
-    dict['adapter_id'] = dict.pop('id_adapter')
+    dict['adapter_id'] = dict.pop('id_adapter_id')
     return dict
 
 def preparation_record_dict(instance):
     dict = model_to_dict(instance)
     dict['record_id'] = dict.pop('id_record')
-    dict['adapter_id'] = dict.pop('id_adapter_id')
+    dict['adapter_id'] = dict.pop('id_adapter')
     return dict
 
 @app.task(time_limit=115)
