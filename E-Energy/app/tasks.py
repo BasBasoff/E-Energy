@@ -182,10 +182,10 @@ def records_caching():
 
         CachingRecord.objects.create(
             p_AU1=p_AU1,
-            P_BU1=p_BU1,
+            p_BU1=p_BU1,
             p_CU1=p_CU1,
             p_AI1=p_AI1,
-            P_BI1=p_BI1,
+            p_BI1=p_BI1,
             p_CI1=p_CI1,
             x1=x1,
             x2=x2,
