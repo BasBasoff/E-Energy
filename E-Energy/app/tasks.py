@@ -14,7 +14,7 @@ def preparation_dict(instance):
 def preparation_record_dict(instance):
     dict = model_to_dict(instance)
     dict['record_id'] = dict.pop('id_record')
-    dict['parameter_id'] = dict.pop('id_parameter')
+    dict['adapter_id'] = dict.pop('id_adapter_id')
     return dict
 
 @app.task(time_limit=115)
