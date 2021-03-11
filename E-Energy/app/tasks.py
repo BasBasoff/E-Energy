@@ -65,22 +65,6 @@ def records_caching():
     ).order_by('record_time')
 
     for input_record in new_input_records.iterator(chunk_size=200):
-        p_AU1=0
-        p_BU1=0
-        p_CU1=0
-        p_AI1=0
-        p_BI1=0
-        p_CI1=0
-        x1=0
-        x2=0
-        x3=0
-        x4=0
-        x5=0
-        x6=0
-        x0=0
-        x8=0
-        xh=0
-        xp=0
 
         output_record = Records.objects.get(
             id_adapter__adapter_name__icontains='выход',
@@ -213,6 +197,8 @@ def records_caching():
             p_AI2=p_AI2,
             p_BI2=p_BI2,
             p_CI2=p_CI2,
+
+            total_power=total_power,
 
             x1=x1,
             x2=x2,
