@@ -172,12 +172,12 @@ def records_caching():
 
         total_power = p_AU1*p_AI1 + p_BU1*p_BI1 + p_CU1*p_CI1
 
-        x1 = p_AI1*p_AU2
-        x2 = p_AI2*p_AU1
-        x3 = p_BI1*p_BU2
-        x4 = p_BI2*p_BU1
-        x5 = p_CI1*p_CU2
-        x6 = p_CI2*p_CU1
+        x1 = p_AI1*p_AU2/60
+        x2 = p_AI2*p_AU1/60
+        x3 = p_BI1*p_BU2/60
+        x4 = p_BI2*p_BU1/60
+        x5 = p_CI1*p_CU2/60
+        x6 = p_CI2*p_CU1/60
         x0 = x1+x3+x5
         x8 = x2+x4+x5
         xh = x0/x8 if x8 !=0 else 0
