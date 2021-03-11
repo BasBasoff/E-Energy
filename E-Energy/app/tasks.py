@@ -2,6 +2,7 @@ from E_Energy.celeryapp import app
 from .models import CachingData, Data, AdapterParameters, Records, CachingRecord
 from datetime import datetime
 from django.forms.models import model_to_dict
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def preparation_dict(instance):
@@ -48,11 +49,15 @@ def data_caching():
 
 @app.task(time_limit=115)
 def records_caching():
-    last_record_id = CachingRecord.objects.latest('record_time').record_id
-    print(last_record_id)
-    print(CachingRecord.objects.latest('record_time').record_time)
-    last_caching_record = Records.objects.get(id_record = last_record_id )
-    print(last_caching_record.record_time)
+    try:
+        last_record_id = CachingRecord.objects.latest('record_time').record_id
+        print(last_record_id)
+        print(CachingRecord.objects.latest('record_time').record_time)
+        last_caching_record = Records.objects.get(id_record = last_record_id )
+        print(last_caching_record.record_time)
+
+    except (AttributeError, ObjectDoesNotExist):
+       last_caching_record = Records(record_time=datetime(2020, 1,26,0,1))
 
     new_input_records = Records.objects.filter(
         record_time__gt=last_caching_record.record_time,
