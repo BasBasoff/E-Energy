@@ -37,24 +37,18 @@ $('.chart').each(function () {
 				data: data.values,
 				borderColor: color,
 				fill: false,
-				radius: 0
+				radius: 0,
+				hitRadius: 7,
+				hoverRadius: 5
 			}]
 		},
 		options: {
 			scales: {
 				xAxes: [{
-					display: true,
-					scaleLabel: {
-						display: true,
-						labelString: 'Date time'
-					}
+					display: true,					
 				}],
 				yAxes: [{
-					display: true,
-					scaleLabel: {
-						display: true,
-						labelString: 'Value'
-					}
+					display: true,					
 				}]
 			}
 		}

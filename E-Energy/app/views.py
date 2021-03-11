@@ -89,7 +89,7 @@ def home(request):
         record_time__gte = date_from,
         record_time__lte = date_to)\
             .annotate(
-                data_date = Trunc('record_time', segmentation),
+                data_date = Trunc('record_time', segmentation, tzinfo=None),
             ).values('data_date').annotate(
                 p_AU1=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk)),
                 p_AI1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk)),
@@ -102,10 +102,7 @@ def home(request):
                 p_BU2=Avg('measure_value', filter=Q(parameter_id = p_BU2.pk)),
                 p_BI2=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk)),
                 p_CU2=Avg('measure_value', filter=Q(parameter_id = p_CU2.pk)),
-                p_CI2=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk)),
-                #A_power=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93,
-                #B_power=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93,
-                #C_power=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
+                p_CI2=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk)),                
                 total_power = Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93 +
                               Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93 +
                               Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
@@ -116,22 +113,19 @@ def home(request):
                 x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
                 x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
             )
-        Params_by_hour_list = list(Params_by_hour)
-        
+        Params_by_hour_list = list(Params_by_hour)        
         #   Суммирование мощности по фазам
         total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list]))#Суммирование и округление до третьего знака
         #Рассчёт экономии
         x0 = sum([_['x1'] + _['x3'] + _['x5'] or 0 for _ in Params_by_hour_list])
         x8 = sum([_['x2'] + _['x4'] + _['x6'] or 0 for _ in Params_by_hour_list])
         XH = x0/x8*100 if x8 != 0 else 0
-
         XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
         #Подготовка данных для графика экономии
         for el in Params_by_hour_list:
             _X0 = sum([el['x1'], el['x3'], el['x5']])
             _X8 = sum([el['x2'], el['x4'], el['x6']])
             power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(_X0/_X8*100))
-
         #Сбор данных напряжения и тока в таблицу
         #   Вход
         last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).last()
@@ -142,31 +136,15 @@ def home(request):
         AI1 = next((item.measure_value for item in last_datas if item.id_parameter==p_AI1.pk), 0)
         BI1 = next((item.measure_value for item in last_datas if item.id_parameter==p_BI1.pk), 0)
         CI1 = next((item.measure_value for item in last_datas if item.id_parameter==p_CI1.pk), 0)
-        
-		#AU1 = Data.objects.get(id_parameter = p_AU1.pk, id_record = last_record_in.pk).measure_value
-        
-		#BU1 = Data.objects.get(id_parameter = p_BU1.pk, id_record = last_record_in.pk).measure_value
-        #CU1 = Data.objects.get(id_parameter = p_CU1.pk, id_record = last_record_in.pk).measure_value
-        #AI1 = Data.objects.get(id_parameter = p_AI1.pk, id_record = last_record_in.pk).measure_value
-        #BI1 = Data.objects.get(id_parameter = p_BI1.pk, id_record = last_record_in.pk).measure_value
-        #CI1 = Data.objects.get(id_parameter = p_CI1.pk, id_record = last_record_in.pk).measure_value
         #   Выход
         last_record_out = Records.objects.filter(id_adapter = dev.adapters.last()).last()
-        last_datas = list(Data.objects.filter(id_record = last_record_out.pk))
-        
+        last_datas = list(Data.objects.filter(id_record = last_record_out.pk))        
         AU2 = next((item.measure_value for item in last_datas if item.id_parameter==p_AU2.pk), 0)
         BU2 = next((item.measure_value for item in last_datas if item.id_parameter==p_BU2.pk), 0)
         CU2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CU2.pk), 0)
         AI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_AI2.pk), 0)
         BI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_BI2.pk), 0)
-        CI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CI2.pk), 0)		
-		#AU2 = Data.objects.get(id_parameter = p_AU2.pk, id_record = last_record_out.pk).measure_value
-        #BU2 = Data.objects.get(id_parameter = p_BU2.pk, id_record = last_record_out.pk).measure_value
-        #CU2 = Data.objects.get(id_parameter = p_CU2.pk, id_record = last_record_out.pk).measure_value
-        #AI2 = Data.objects.get(id_parameter = p_AI2.pk, id_record = last_record_out.pk).measure_value
-        #BI2 = Data.objects.get(id_parameter = p_BI2.pk, id_record = last_record_out.pk).measure_value
-        #CI2 = Data.objects.get(id_parameter = p_CI2.pk, id_record = last_record_out.pk).measure_value
-
+        CI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CI2.pk), 0)        
         devices_dict[dev.name] = {'pk':dev.pk,'values':{
                                                         'A_U1':AU1, 'A_I1':AI1, 'A_U2':AU2, 'A_I2':AI2,
                                                         'B_U1':BU1, 'B_I1':BI1, 'B_U2':BU2, 'B_I2':BI2,
@@ -194,8 +172,8 @@ def myconverter(o):
 
 @login_required
 def entrances(request, device):
-    data_dict = defaultdict(dict)  
-    form = FilterForm()
+    data_dict = defaultdict(dict)      
+
     if request.method == 'POST':
         form = FilterForm(request.POST)
         if form.is_valid():            
@@ -209,10 +187,7 @@ def entrances(request, device):
                         max_date=Max('record_time')
                     )['max_date']
         records_startdate = records_maxdate - timedelta(1) if records_maxdate else None
-    
-    #records = Records.objects.filter(id_adapter__device=device, 
-    #                                 record_time__gte=records_startdate, 
-    #                                 record_time__lte=records_maxdate).values_list('id_record', flat=True)        
+       
     _data_id_links = {}
     parameters = AdapterParameters.objects.select_related('id_adapter').filter(
         Q(id_adapter__device=device) &
@@ -221,13 +196,23 @@ def entrances(request, device):
     for p in parameters:
         _data_id_links[p.id_parameter] = p.id_adapter.adapter_name, p.parameter_name
     _data = defaultdict(list)
-    segmentation = 'hour'
+    if records_maxdate - records_startdate <= timedelta(days=1):
+        segmentation = 'minute'
+    elif (records_maxdate - records_startdate > timedelta(days=1)) & (records_maxdate - records_startdate <= timedelta(days=15)):  
+        segmentation = 'hour'
+    elif (records_maxdate - records_startdate > timedelta(days=15)) & (records_maxdate - records_startdate <= timedelta(weeks=28)):
+        segmentation = 'day'
+    elif (records_maxdate - records_startdate > timedelta(weeks=28)) & (records_maxdate - records_startdate <= timedelta(weeks=28*15)):
+        segmentation = 'quarter'
+    else:
+        segmentation = 'month'
+
     data_query = Data.objects.filter(
                             id_record__id_adapter__device=device, 
                             id_record__record_time__gte=records_startdate, 
                             id_record__record_time__lte=records_maxdate,
                             id_parameter__in=parameters.values('id_parameter'))\
-                        .annotate(data_date=Trunc('id_record__record_time', segmentation))\
+                        .annotate(data_date=Trunc('id_record__record_time', segmentation, tzinfo=None))\
                         .prefetch_related('id_record')\
                         .values('id_parameter', 'data_date', 'id_record__id_adapter')\
                         .annotate(measure_value=Avg('measure_value'))
