@@ -90,19 +90,16 @@ def records_caching():
         input_datas = list(
             Data.objects.filter(id_record=input_record.id_record)
         )
-        print(f'input_datas count:{len(input_datas)}')
+
         output_datas = list(
             Data.objects.filter(id_record=output_record.id_record)
         )
-        print(f'output_datas count:{len(output_datas)}')
 
         input_params = AdapterParameters.objects.filter(
             id_adapter = input_record.id_adapter_id)
-        print(f'input_params count:{len(input_params)}')
 
         output_params = AdapterParameters.objects.filter(
             id_adapter = output_record.id_adapter_id)
-        print(f'output_params count:{len(output_params)}')
 
         p_AU1 = next(
             (data.measure_value for data in input_datas \
@@ -190,6 +187,7 @@ def records_caching():
             0)
 
         total_power = p_AU1*p_AI1 + p_BU1*p_BI1 + p_CU1*p_CI1
+
         x1 = p_AI1*p_AU2
         x2 = p_AI2*p_AU1
         x3 = p_BI1*p_BU2
@@ -208,6 +206,14 @@ def records_caching():
             p_AI1=p_AI1,
             p_BI1=p_BI1,
             p_CI1=p_CI1,
+
+            p_AU2=p_AU2,
+            p_BU2=p_BU2,
+            p_CU2=p_CU2,
+            p_AI2=p_AI2,
+            p_BI2=p_BI2,
+            p_CI2=p_CI2,
+
             x1=x1,
             x2=x2,
             x3=x3,
