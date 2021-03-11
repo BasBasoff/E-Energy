@@ -64,7 +64,25 @@ def records_caching():
         id_adapter__adapter_name__icontains='вход'
     ).order_by('record_time')
 
-    for input_record in new_input_records.iterator(chunk_size=50):
+    for input_record in new_input_records:
+
+        p_AU1=0
+        p_BU1=0
+        p_CU1=0
+        p_AI1=0
+        p_BI1=0
+        p_CI1=0
+        x1=0
+        x2=0
+        x3=0
+        x4=0
+        x5=0
+        x6=0
+        x0=0
+        x8=0
+        xh=0
+        xp=0
+
         output_record = Records.objects.get(
             id_adapter__adapter_name__icontains='выход',
             id_adapter__device__in=input_record.id_adapter.device_set.all(),
@@ -73,15 +91,19 @@ def records_caching():
         input_datas = list(
             Data.objects.filter(id_record=input_record.id_record)
         )
+        print(f'input_datas count:{len(input_datas)}')
         output_datas = list(
             Data.objects.filter(id_record=output_record.id_record)
         )
+        print(f'output_datas count:{len(ouyput_datas)}')
 
         input_params = AdapterParameters.objects.filter(
             id_adapter = input_record.id_adapter_id)
+        print(f'input_params count:{len(input_params)}')
+
         output_params = AdapterParameters.objects.filter(
             id_adapter = output_record.id_adapter_id)
-
+        print(f'output_params count:{len(output_params)}')
 
         p_AU1 = next(
             (data.measure_value for data in input_datas \
