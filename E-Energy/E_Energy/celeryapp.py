@@ -12,8 +12,8 @@ app.autodiscover_tasks()
 app.conf.timezone = 'UTC'
 
 app.conf.beat_schedule = {
-    'every-hour': {
-        'task': 'app.tasks.data_caching',
+    'every-minute': {
+        'task': 'app.tasks.records_caching',
         'schedule': crontab(minute='*/1', hour='*/1')
     },
 }
