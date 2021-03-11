@@ -38,7 +38,9 @@ $('.chart').each(function () {
 				fill: false,
 				radius: 0,
 				hitRadius: 3,
-				hoverRadius: 3
+				hoverRadius: 3,
+				responsive: true,
+				maintainAspectRatio: false
 			}]
 		},
 		options: {

@@ -196,6 +196,7 @@ def entrances(request, device):
     for p in parameters:
         _data_id_links[p.id_parameter] = p.id_adapter.adapter_name, p.parameter_name
     _data = defaultdict(list)
+
     if records_maxdate - records_startdate <= timedelta(hours=3):
         segmentation = 'minute'
     elif (records_maxdate - records_startdate > timedelta(hours=3)) & (records_maxdate - records_startdate <= timedelta(days=7)):  
