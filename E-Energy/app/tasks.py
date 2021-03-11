@@ -87,7 +87,7 @@ def records_caching():
                 id_adapter = output_record.id_adapter_id)
 
         except ObjectDoesNotExist:
-            output_record = Records.objects.new()
+            output_record = Records()
             output_datas = []
             output_params = []
 
