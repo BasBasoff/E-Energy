@@ -96,7 +96,7 @@ class CachingData(models.Model):
     parameter_id = models.IntegerField(blank=True, null=True, db_index=True)
     record_time = models.DateTimeField(null=True, blank=True, db_index=True)
     param_value = models.FloatField(null=True, blank=True)
-    measure_value = models.FloatField(null=True, blank=True)    
+    measure_value = models.FloatField(null=True, blank=True)
 
 
 class DataCur(models.Model):
@@ -210,6 +210,38 @@ class Records(models.Model):
         db_table = 'records'
         unique_together = (('id_adapter', 'record_time', 'record_index', 'id_record'),)
 
+
+class CachingRecord(models.Model):
+    #поля заполняются из входного Record
+    record_id = models.IntegerField()
+    adapter_id = models.IntegerField()
+    record_time = models.DateTimeField()
+    status = models.IntegerField()
+    record_index = models.IntegerField()
+    #расчетные данные
+    p_AU1 =  models.FloatField(null=True, blank=True)
+    p_AI1 = models.FloatField(null=True, blank=True)
+    p_BU1 = models.FloatField(null=True, blank=True)
+    p_BI1 = models.FloatField(null=True, blank=True)
+    p_CU1 = models.FloatField(null=True, blank=True)
+    p_CI1 = models.FloatField(null=True, blank=True)
+    p_AU2 = models.FloatField(null=True, blank=True)
+    p_AI2 = models.FloatField(null=True, blank=True)
+    p_BU2 = models.FloatField(null=True, blank=True)
+    p_BI2 = models.FloatField(null=True, blank=True)
+    p_CU2 = models.FloatField(null=True, blank=True)
+    p_CI2 = models.FloatField(null=True, blank=True)
+    total_power = models.FloatField(null=True, blank=True)
+    x1 = models.FloatField(null=True, blank=True)
+    x2 = models.FloatField(null=True, blank=True)
+    x3 = models.FloatField(null=True, blank=True)
+    x4 = models.FloatField(null=True, blank=True)
+    x5 = models.FloatField(null=True, blank=True)
+    x6 = models.FloatField(null=True, blank=True)
+    x0 = models.FloatField(null=True, blank=True)
+    x8 = models.FloatField(null=True, blank=True)
+    xh = models.FloatField(null=True, blank=True)
+    xp = models.FloatField(null=True, blank=True)
 
 class RecordsCur(models.Model):
     id_adapter = models.OneToOneField(Adapters, models.DO_NOTHING, db_column='ID_ADAPTER', primary_key=True)  # Field name made lowercase.
