@@ -99,8 +99,7 @@ var chart = new Chart(cnvs, {
 if (tarif) {
 	tarif.onchange = function () {
 		for (str of tbody.children) {
-			str.children['XP_cost'].innerHTML = (tarif.value * str.children['XP'].innerHTML).toFixed(3)
-			str.children['XP_percent'].innerHTML = ((str.children['XP_cost'].innerHTML / (str.children['total_power'].innerHTML*tarif.value))*100).toFixed(3)
+			str.children['XP_cost'].innerHTML = (tarif.value * str.children['XP'].innerHTML).toFixed(3)			
 	    }
 	}
 }

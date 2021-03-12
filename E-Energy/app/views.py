@@ -27,45 +27,45 @@ def home(request):
     for dev in devices:
         params_list = []		
         dev_adapters_params = AdapterParameters.objects.filter(id_adapter__in = dev.adapters.all()).select_related('id_adapter')
-        p_AU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 1',
-                                        id_adapter__adapter_name__icontains = 'вход',
-                                        )
-        p_BU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 2',
-                                        id_adapter__adapter_name__icontains = 'вход',
-                                        )
-        p_CU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 3',
-                                        id_adapter__adapter_name__icontains = 'вход',
-                                        )
-        
-        p_AI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 1',
-                                        id_adapter__adapter_name__icontains = 'вход',
-                                        )
-        p_BI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 2',
-                                        id_adapter__adapter_name__icontains = 'вход',
-                                        )
-        p_CI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 3',
-                                        id_adapter__adapter_name__icontains = 'вход',
-                                        )
-        
-        p_AU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 1',
-                                        id_adapter__adapter_name__icontains = 'выход',
-                                        )
-        p_BU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 2',
-                                        id_adapter__adapter_name__icontains = 'выход',
-                                        )
-        p_CU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 3',
-                                        id_adapter__adapter_name__icontains = 'выход',
-                                        )
-        
-        p_AI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 1',
-                                        id_adapter__adapter_name__icontains = 'выход',
-                                        )
-        p_BI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 2',
-                                        id_adapter__adapter_name__icontains = 'выход',
-                                        )
-        p_CI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 3',
-                                        id_adapter__adapter_name__icontains = 'выход',
-                                        )
+        #p_AU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 1',
+        #                                id_adapter__adapter_name__icontains = 'вход',
+        #                                )
+        #p_BU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 2',
+        #                                id_adapter__adapter_name__icontains = 'вход',
+        #                                )
+        #p_CU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 3',
+        #                                id_adapter__adapter_name__icontains = 'вход',
+        #                                )
+        #
+        #p_AI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 1',
+        #                                id_adapter__adapter_name__icontains = 'вход',
+        #                                )
+        #p_BI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 2',
+        #                                id_adapter__adapter_name__icontains = 'вход',
+        #                                )
+        #p_CI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 3',
+        #                                id_adapter__adapter_name__icontains = 'вход',
+        #                                )
+        #
+        #p_AU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 1',
+        #                                id_adapter__adapter_name__icontains = 'выход',
+        #                                )
+        #p_BU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 2',
+        #                                id_adapter__adapter_name__icontains = 'выход',
+        #                                )
+        #p_CU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 3',
+        #                                id_adapter__adapter_name__icontains = 'выход',
+        #                                )
+        #
+        #p_AI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 1',
+        #                                id_adapter__adapter_name__icontains = 'выход',
+        #                                )
+        #p_BI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 2',
+        #                                id_adapter__adapter_name__icontains = 'выход',
+        #                                )
+        #p_CI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 3',
+        #                                id_adapter__adapter_name__icontains = 'выход',
+        #                                )
         
         if request.method == 'POST':
             form = FilterForm(request.POST)
@@ -76,7 +76,7 @@ def home(request):
                 return
         else:
             form = FilterForm() 
-            date_to = CachingData.objects.filter(adapter_id = dev.adapters.last().id_adapter).aggregate(
+            date_to = CachingRecord.objects.filter(adapter_id__in = dev.adapters.all()).aggregate(
                                 max_date=Max('record_time')
                             )['max_date']
             if date_to is None:
@@ -85,72 +85,94 @@ def home(request):
         
         segmentation = 'hour'        
         
-        Params_by_hour = CachingData.objects.filter(
+        #Params_by_hour = CachingRecord.objects.filter(
+        #record_time__gte = date_from,
+        #record_time__lte = date_to)\
+        #    .annotate(
+        #        data_date = Trunc('record_time', segmentation, tzinfo=None),
+        #    ).values('data_date').annotate(
+        #        p_AU1=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk)),
+        #        p_AI1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk)),
+        #        p_BU1=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk)),
+        #        p_BI1=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk)),
+        #        p_CU1=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk)),
+        #        p_CI1=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk)),
+        #        p_AU2=Avg('measure_value', filter=Q(parameter_id = p_AU2.pk)),
+        #        p_AI2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk)),
+        #        p_BU2=Avg('measure_value', filter=Q(parameter_id = p_BU2.pk)),
+        #        p_BI2=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk)),
+        #        p_CU2=Avg('measure_value', filter=Q(parameter_id = p_CU2.pk)),
+        #        p_CI2=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk)),                
+        #        total_power = Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93 +
+        #                      Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93 +
+        #                      Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
+        #        x1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU2.pk))*0.93,
+        #        x2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*0.93,
+        #        x3=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU2.pk))*0.93,
+        #        x4=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*0.93,
+        #        x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
+        #        x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
+        #    )
+
+        Params_by_hour = CachingRecord.objects.filter(
+        adapter_id__in = dev.adapters.all(),
         record_time__gte = date_from,
         record_time__lte = date_to)\
             .annotate(
                 data_date = Trunc('record_time', segmentation, tzinfo=None),
             ).values('data_date').annotate(
-                p_AU1=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk)),
-                p_AI1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk)),
-                p_BU1=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk)),
-                p_BI1=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk)),
-                p_CU1=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk)),
-                p_CI1=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk)),
-                p_AU2=Avg('measure_value', filter=Q(parameter_id = p_AU2.pk)),
-                p_AI2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk)),
-                p_BU2=Avg('measure_value', filter=Q(parameter_id = p_BU2.pk)),
-                p_BI2=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk)),
-                p_CU2=Avg('measure_value', filter=Q(parameter_id = p_CU2.pk)),
-                p_CI2=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk)),                
-                total_power = Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93 +
-                              Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93 +
-                              Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
-                x1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU2.pk))*0.93,
-                x2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*0.93,
-                x3=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU2.pk))*0.93,
-                x4=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*0.93,
-                x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
-                x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
+                p_AU1=Avg('p_AU1'),
+                p_AI1=Avg('p_AI1'),
+                p_BU1=Avg('p_BU1'),
+                p_BI1=Avg('p_BI1'),
+                p_CU1=Avg('p_CU1'),
+                p_CI1=Avg('p_CI1'),
+                p_AU2=Avg('p_AU2'),
+                p_AI2=Avg('p_AI2'),
+                p_BU2=Avg('p_BU2'),
+                p_BI2=Avg('p_BI2'),
+                p_CU2=Avg('p_CU2'),
+                p_CI2=Avg('p_CI2'),                
+                total_power = Avg('total_power'),
+                x0 = Avg('x0'),
+                x8 = Avg('x8'),
+                xp = Avg('xp')
             )
         Params_by_hour_list = list(Params_by_hour)        
         #   Суммирование мощности по фазам
         total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list]))#Суммирование и округление до третьего знака
         #Рассчёт экономии
-        x0 = sum([_['x1'] + _['x3'] + _['x5'] or 0 for _ in Params_by_hour_list])
-        x8 = sum([_['x2'] + _['x4'] + _['x6'] or 0 for _ in Params_by_hour_list])
-        XH = x0/x8*100 if x8 != 0 else 0
-        XP = "{0:.3f}".format(100-XH) #Экономия в Квт*ч
+        XP = "{0:.3f}".format(sum([100-_['xp'] for _ in Params_by_hour_list])) #Экономия в Квт*ч
+        XP_percent = "{0:.3f}".format(float(XP)/float(total_power)*100)
         #Подготовка данных для графика экономии
         for el in Params_by_hour_list:
-            _X0 = sum([el['x1'], el['x3'], el['x5']])
-            _X8 = sum([el['x2'], el['x4'], el['x6']])
-            power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(_X0/_X8*100))
+            power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(el['x0']/el['x8']*100))
         #Сбор данных напряжения и тока в таблицу
         #   Вход
-        last_record_in = Records.objects.filter(id_adapter = dev.adapters.first()).last()
-        last_datas = list(Data.objects.filter(id_record = last_record_in.pk))
-        AU1 = next((item.measure_value for item in last_datas if item.id_parameter==p_AU1.pk), 0)
-        BU1 = next((item.measure_value for item in last_datas if item.id_parameter==p_BU1.pk), 0)
-        CU1 = next((item.measure_value for item in last_datas if item.id_parameter==p_CU1.pk), 0)
-        AI1 = next((item.measure_value for item in last_datas if item.id_parameter==p_AI1.pk), 0)
-        BI1 = next((item.measure_value for item in last_datas if item.id_parameter==p_BI1.pk), 0)
-        CI1 = next((item.measure_value for item in last_datas if item.id_parameter==p_CI1.pk), 0)
+        #last_record_in = CachingRecord.objects.filter(adapter_id__in = dev.adapters.all()).aggregate(
+        #                        max_date=Max('record_time')
+        #                    )['max_date']        
+        AU1 = "{0:.3f}".format(Params_by_hour.last()['p_AU1'])
+        BU1 = "{0:.3f}".format(Params_by_hour.last()['p_BU1'])
+        CU1 = "{0:.3f}".format(Params_by_hour.last()['p_CU1'])
+        AI1 = "{0:.3f}".format(Params_by_hour.last()['p_AI1'])
+        BI1 = "{0:.3f}".format(Params_by_hour.last()['p_BI1'])
+        CI1 = "{0:.3f}".format(Params_by_hour.last()['p_CI1'])
         #   Выход
-        last_record_out = Records.objects.filter(id_adapter = dev.adapters.last()).last()
-        last_datas = list(Data.objects.filter(id_record = last_record_out.pk))        
-        AU2 = next((item.measure_value for item in last_datas if item.id_parameter==p_AU2.pk), 0)
-        BU2 = next((item.measure_value for item in last_datas if item.id_parameter==p_BU2.pk), 0)
-        CU2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CU2.pk), 0)
-        AI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_AI2.pk), 0)
-        BI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_BI2.pk), 0)
-        CI2 = next((item.measure_value for item in last_datas if item.id_parameter==p_CI2.pk), 0)        
+        
+
+        AU2 = "{0:.3f}".format(Params_by_hour.last()['p_AU2'])
+        BU2 = "{0:.3f}".format(Params_by_hour.last()['p_BU2'])
+        CU2 = "{0:.3f}".format(Params_by_hour.last()['p_CU2'])
+        AI2 = "{0:.3f}".format(Params_by_hour.last()['p_AI2'])
+        BI2 = "{0:.3f}".format(Params_by_hour.last()['p_BI2'])
+        CI2 = "{0:.3f}".format(Params_by_hour.last()['p_CI2'])        
         devices_dict[dev.name] = {'pk':dev.pk,'values':{
                                                         'A_U1':AU1, 'A_I1':AI1, 'A_U2':AU2, 'A_I2':AI2,
                                                         'B_U1':BU1, 'B_I1':BI1, 'B_U2':BU2, 'B_I2':BI2,
                                                         'C_U1':CU1, 'C_I1':CI1, 'C_U2':CU2, 'C_I2':CI2,
                                                         'total_power': total_power,
-                                                        'XP': XP,                                                        
+                                                        'XP': XP, 'XP_percent':XP_percent
                                                         }
                                   }    
     power_json = []
@@ -211,7 +233,7 @@ def entrances(request, device):
         segmentation = 'year'
 
 
-    data_query = Data.objects.filter(
+    data_query = CachingRecord.objects.filter(
                             id_record__id_adapter__device=device, 
                             id_record__record_time__gte=records_startdate, 
                             id_record__record_time__lte=records_maxdate,
