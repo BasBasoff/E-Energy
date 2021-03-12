@@ -81,7 +81,7 @@ def home(request):
                             )['max_date']
             if date_to is None:
                 continue
-            date_from = date_to - timedelta(1) if date_to else None
+            date_from = date_to - timedelta(hours=12) if date_to else None
         
         segmentation = 'hour'        
         
@@ -120,7 +120,7 @@ def home(request):
         record_time__lte = date_to)\
             .annotate(
                 data_date = Trunc('record_time', segmentation, tzinfo=None),
-            ).values('data_date').annotate(
+            ).values('data_date', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6').annotate(
                 p_AU1=Avg('p_AU1'),
                 p_AI1=Avg('p_AI1'),
                 p_BU1=Avg('p_BU1'),
@@ -134,15 +134,16 @@ def home(request):
                 p_CU2=Avg('p_CU2'),
                 p_CI2=Avg('p_CI2'),                
                 total_power = Avg('total_power'),
-                x0 = Avg('x0'),
-                x8 = Avg('x8'),
-                xp = Avg('xp')
+                x0 = Sum('x1') + Sum('x3') + Sum('x5'),
+                x8 = Sum('x2') + Sum('x4') + Sum('x6'),
+                xh = (Sum('x1') + Sum('x3') + Sum('x5'))/(Sum('x2') + Sum('x4') + Sum('x6')),
+                xp = 100 - (Sum('x1') + Sum('x3') + Sum('x5'))/(Sum('x2') + Sum('x4') + Sum('x6'))
             )
         Params_by_hour_list = list(Params_by_hour)        
         #   Суммирование мощности по фазам
-        total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list]))#Суммирование и округление до третьего знака
+        total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list])/1000)#Суммирование и округление до третьего знака
         #Рассчёт экономии
-        XP = "{0:.3f}".format(sum([100-_['xp'] for _ in Params_by_hour_list])) #Экономия в Квт*ч
+        XP = "{0:.3f}".format(sum([100-_['xp'] for _ in Params_by_hour_list])/1000) #Экономия в Квт*ч
         XP_percent = "{0:.3f}".format(float(XP)/float(total_power)*100)
         #Подготовка данных для графика экономии
         for el in Params_by_hour_list:
@@ -194,21 +195,24 @@ def myconverter(o):
 
 @login_required
 def entrances(request, device):
-    data_dict = defaultdict(dict)      
-
+    data_dict = defaultdict(dict)
+    dev = Device.objects.get(pk = device)
+    
     if request.method == 'POST':
         form = FilterForm(request.POST)
-        if form.is_valid():            
-            records_startdate = form.cleaned_data['date_from']
-            records_maxdate = form.cleaned_data['date_to']
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']                
+            date_to = form.cleaned_data['date_to']                
         else:
-            return 
+            return
     else:
-        form = FilterForm()
-        records_maxdate = Records.objects.filter(id_adapter__device=device).aggregate(
-                        max_date=Max('record_time')
-                    )['max_date']
-        records_startdate = records_maxdate - timedelta(1) if records_maxdate else None
+        form = FilterForm() 
+        date_to = CachingRecord.objects.filter(adapter_id__in = Device.objects.get(pk = device).adapters.all()).aggregate(
+                            max_date=Max('record_time')
+                        )['max_date']
+        if date_to is None:
+            return #TODO: Сообщение: "Нет данных"
+        date_from = date_to - timedelta(days = 1) if date_to else None
        
     _data_id_links = {}
     parameters = AdapterParameters.objects.select_related('id_adapter').filter(
@@ -219,35 +223,84 @@ def entrances(request, device):
         _data_id_links[p.id_parameter] = p.id_adapter.adapter_name, p.parameter_name
     _data = defaultdict(list)
 
-    if records_maxdate - records_startdate <= timedelta(hours=3):
+    if date_to - date_from <= timedelta(hours=3):
         segmentation = 'minute'
-    elif (records_maxdate - records_startdate > timedelta(hours=3)) & (records_maxdate - records_startdate <= timedelta(days=7)):  
+    elif (date_to - date_from > timedelta(hours=3)) & (date_to - date_from <= timedelta(days=7)):  
         segmentation = 'hour'
-    elif (records_maxdate - records_startdate > timedelta(days=7)) & (records_maxdate - records_startdate <= timedelta(weeks=14)):
+    elif (date_to - date_from > timedelta(days=7)) & (date_to - date_from <= timedelta(weeks=14)):
         segmentation = 'day'
-    elif (records_maxdate - records_startdate > timedelta(weeks=14)) & (records_maxdate - records_startdate <= timedelta(weeks=28*3)):
+    elif (date_to - date_from > timedelta(weeks=14)) & (date_to - date_from <= timedelta(weeks=28*3)):
         segmentation = 'week'
-    elif (records_maxdate - records_startdate > timedelta(weeks=28*3)) & (records_maxdate - records_startdate <= timedelta(weeks=28*15)):
+    elif (date_to - date_from > timedelta(weeks=28*3)) & (date_to - date_from <= timedelta(weeks=28*15)):
         segmentation = 'month'
     else:
         segmentation = 'year'
 
-
-    data_query = CachingRecord.objects.filter(
+    #params = ['p_AU1',
+    #          'p_AI1',
+    #          'p_BU1',
+    #          'p_BI1',
+    #          'p_CU1',
+    #          'p_CI1',
+    #          'p_AU2',
+    #          'p_AI2',
+    #          'p_BU2',
+    #          'p_BI2',
+    #          'p_CU2',
+    #          'p_CI2']
+    data_query = Data.objects.filter(
                             id_record__id_adapter__device=device, 
-                            id_record__record_time__gte=records_startdate, 
-                            id_record__record_time__lte=records_maxdate,
+                            id_record__record_time__gte=date_from, 
+                            id_record__record_time__lte=date_to,
                             id_parameter__in=parameters.values('id_parameter'))\
                         .annotate(data_date=Trunc('id_record__record_time', segmentation, tzinfo=None))\
                         .prefetch_related('id_record')\
                         .values('id_parameter', 'data_date', 'id_record__id_adapter')\
                         .annotate(measure_value=Avg('measure_value'))
-    for d in data_query.iterator():        
+    #for adapt in dev.adapters.all():
+    #    adapter_name = Adapters.objects.get(id_adapter = adapt.id_adapter).adapter_name
+    #    data_query = CachingRecord.objects.filter(
+    #                                            adapter_id=adapt.id_adapter, 
+    #                                            record_time__gte=date_from, 
+    #                                            record_time__lte=date_to,
+    #                                            )\
+    #                                .annotate(data_date=Trunc('record_time', segmentation, tzinfo=None))\
+    #                                .values('data_date', 'adapter_id')\
+    #                                .annotate(p_AU1 = Avg('p_AU1'),
+    #                                          p_AI1 = Avg('p_AI1'),
+    #                                          p_BU1 = Avg('p_BU1'),
+    #                                          p_BI1 = Avg('p_BI1'),
+    #                                          p_CU1 = Avg('p_CU1'),
+    #                                          p_CI1 = Avg('p_CI1'),
+    #                                          p_AU2 = Avg('p_AU2'),
+    #                                          p_AI2 = Avg('p_AI2'),
+    #                                          p_BU2 = Avg('p_BU2'),
+    #                                          p_BI2 = Avg('p_BI2'),
+    #                                          p_CU2 = Avg('p_CU2'),
+    #                                          p_CI2 = Avg('p_CI2'))
+    #    for d in data_query.iterator(): 
+    #        for p in params:
+    #            _data[(adapter_name, p)].append({'y': float(d[p]), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_AU1'].append({'y': float(d['p_AU1']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_AI1'].append({'y': float(d['p_AI1']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_BU1'].append({'y': float(d['p_BU1']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_BI1'].append({'y': float(d['p_BI1']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_CU1'].append({'y': float(d['p_CU1']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_CI1'].append({'y': float(d['p_CI1']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_AU2'].append({'y': float(d['p_AU2']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_AI2'].append({'y': float(d['p_AI2']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_BU2'].append({'y': float(d['p_BU2']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_BI2'].append({'y': float(d['p_BI2']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_CU2'].append({'y': float(d['p_CU2']), 'x': d['data_date'].replace(tzinfo=None)})
+        #_data['p_CI2'].append({'y': float(d['p_CI2']), 'x': d['data_date'].replace(tzinfo=None)})
+
+    for d in data_query.iterator(): 
         _data[d['id_parameter']].append({'y': float(d['measure_value']), 'x': d['data_date'].replace(tzinfo=None)})
     t2 = time()
     for k,v in _data.items():
         adapter_name, parameter_name = _data_id_links[k]
         data_dict[adapter_name][parameter_name] = json.dumps(v, default=myconverter)
+
     return render(
         request,
         'app/entrances.html',        
