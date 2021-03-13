@@ -19,8 +19,7 @@ $('.chart').each(function () {
 	try {
 		data.values = JSON.parse(i).map(function (d) {
 			return d.y
-		}).sort(
-			//data = [JSON.parse(i).map(function (d) { return { x: moment(new Date(d.x)).format("DD/MM/YY HH:mm"), y: d.y } }).sort(
+		}).sort(			
 			function (a, b) {
 				return a.x > b.x ? 1 : -1;
 			}
@@ -62,54 +61,46 @@ $('.chart').each(function () {
 	})
 })
 
-//var cnvs = $('.economy-chart').children('canvas');
-//$('.economy-chart').children('input').each(function () {
-	//var i = i[0] ? i[0].value.values.total_power : '';
+var cnvs = $('.economy-chart').children('canvas');
+var inp = $('.economy-chart').children('input');
+var tar = tarif.value
+inp = inp[0] ? inp[0].value : '';
 
-//})
-//var data = {};
-//try {
-	//data.values = JSON.parse(i).map(function (d) {
-		//return d.y
-	//}).sort(		
-		//function (a, b) {
-			//return a.x > b.x ? 1 : -1;
-		//}
-	//)
-	//data.labels = JSON.parse(i).map(function (d) { return moment(new Date(d.x)).format("DD/MM/YY HH:mm") })
-//}
-//catch (e) { console.error(e) }
-//var chart = new Chart(cnvs, {
-	//type: 'line',
-	//data: {
-		//labels: data.labels,
-		//datasets: [{
-			//label: cnvs.attr('id'),
-			//data: data.values,
-			//borderColor: color,
-			//fill: false,
-			//radius: 0
-		//}]
-	//},
-	//options: {
-		//scales: {
-			//xAxes: [{
-				//display: true,
-				//scaleLabel: {
-					//display: true,
-					//labelString: 'Date time'
-				//}
-			//}],
-			//yAxes: [{
-				//display: true,
-				//scaleLabel: {
-					//display: true,
-					//labelString: 'Value'
-				//}
-			//}]
-		//}
-	//}
-//})
+var data = {
+	values: [],
+	labels: []
+};
+try {
+	parsed = JSON.parse(inp)	
+}
+catch (e) { console.error(e) }
+
+for (d in parsed) {
+	data.labels.push(d)
+}
+data.labels.sort()
+for (d of data.labels) {
+	data.values.push(parsed[d])
+}
+
+var chart = new Chart(cnvs, {
+	type: 'line',
+	data: {
+		labels: data.labels,
+		datasets: [{			
+			label: "Economy",
+			data: data.values,
+			borderColor: 'orange',
+			fill: false,
+			radius: 1,
+			hitRadius: 7,
+			hoverRadius: 5
+		}]
+	},
+	options: {		
+		lineTension: 0
+	}
+})
 
 tarif.onchange = function () {
 	for (str of tbody.children) {

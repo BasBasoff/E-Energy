@@ -134,16 +134,16 @@ def home(request):
                 p_CU2=Avg('p_CU2'),
                 p_CI2=Avg('p_CI2'),                
                 total_power = Avg('total_power'),
-                x0 = Sum('x1') + Sum('x3') + Sum('x5'),
-                x8 = Sum('x2') + Sum('x4') + Sum('x6'),
-                xh = (Sum('x1') + Sum('x3') + Sum('x5'))/(Sum('x2') + Sum('x4') + Sum('x6')),
-                xp = 100 - (Sum('x1') + Sum('x3') + Sum('x5'))/(Sum('x2') + Sum('x4') + Sum('x6'))
+                x0 = Sum('x0'),
+                x8 = Sum('x8'),
+                xh = Sum('xh'),
+                xp = Sum('xp')
             )
         Params_by_hour_list = list(Params_by_hour)        
         #   Суммирование мощности по фазам
         total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list])/1000)#Суммирование и округление до третьего знака
         #Рассчёт экономии
-        XP = "{0:.3f}".format(sum([100-_['xp'] for _ in Params_by_hour_list])/1000) #Экономия в Квт*ч
+        XP = "{0:.3f}".format(sum([_['xp'] for _ in Params_by_hour_list])/1000) #Экономия в Квт*ч
         XP_percent = "{0:.3f}".format(float(XP)/float(total_power)*100)
         #Подготовка данных для графика экономии
         for el in Params_by_hour_list:
