@@ -11,37 +11,35 @@
 	</form>
 </div>
 
-<div class="entrances">
-    {% for adapter, param in data.items %}
-        <h4 class="font-weight-bold">{{adapter}}</h4>
-        <div class="col-12 d-flex">
-            {% for p_name, values in param.items %}
-				{% cycle '<div class="col-6">' '' '' %}
-				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{forloop.counter0}}">{{p_name}}</button>
-				<div class="modal" id="{{forloop.counter0}}" tabindex="-1" aria-hidden="true">
-					<div class="modal-dialog-centered position-static">
-						<div class="modal-content">
-							<div class="modal-body">
-								<div class="chart">
-									<input type="hidden" id="{{adapter|cut:" "}}{{p_name|cut:" "}}" value="{{values}}" />
-									<canvas id="{{p_name}}"></canvas>
+<div class="container entrances">
+    {% for name, values in data.items %}		
+		
+			{% cycle '<div class="row">' '' %}
+				<div class="col-6">
+					<h4 class="font-weight-bold">{{name}}</h4>
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{forloop.counter0}}">{{name}}</button>
+					<div class="modal" id="{{forloop.counter0}}" tabindex="-1" aria-hidden="true">
+						<div class="modal-dialog-centered position-static">
+							<div class="modal-content">
+								<div class="modal-body">
+									<div class="chart">
+										<input type="hidden" id="{{name|cut:" "}}" value="{{values}}" />
+										<canvas id="{{name}}"></canvas>
+									</div>
 								</div>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+								</div>
 							</div>
 						</div>
 					</div>
+					<div class="chart">
+						<input type="hidden" id="{{name|cut:" "}}" value="{{values}}" />
+					    <canvas id="{{name}}"></canvas>
+					</div>		   
 				</div>
-                <div class="chart">
-					<input type="hidden" id="{{adapter|cut:" "}}{{p_name|cut:" "}}" value="{{values}}" />
-                    <canvas id="{{p_name}}"></canvas>
-                </div>    
-				{% cycle '' '' '</div>' %}
-            {% empty %}
-			<p>Пусто</p>
-            {% endfor %}				
-        </div>            
+			{% cycle '' '</div>' %}
+		
     {% empty %}               
     {% endfor %}        
 </div>
