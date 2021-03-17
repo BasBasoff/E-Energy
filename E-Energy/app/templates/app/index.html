@@ -74,11 +74,12 @@
 	</div>
 	<div class="col">		
 		<h2>{#Имя компании#}</h2>
+		
 		<div class="filter d-block">
 			<form class="form" method="post">
 				{% csrf_token %}
-			    {{ form }}
-			    <input type="submit" value="Применить фильтр"/> 
+				<input type="text" id="date_pick" name="date_pick"/>			    
+			    <input class="btn btn-primary" type="submit" value="Применить фильтр"/> 
 			</form>
 		</div>
 		<div class="header d-flex flex-row justify-content-between">

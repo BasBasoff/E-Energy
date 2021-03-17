@@ -6,7 +6,7 @@
     <RootNamespace>E-Energy</RootNamespace>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
-    <InterpreterId>Global|PythonCore|3.9-32</InterpreterId>
+    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
     <SuppressPackageInstallationPrompt>True</SuppressPackageInstallationPrompt>
   </PropertyGroup>
   <PropertyGroup>
@@ -56,12 +56,20 @@
     <Folder Include="app\static\app\" />
     <Folder Include="app\static\app\content\" />
     <Folder Include="app\static\app\fonts\" />
+    <Folder Include="app\static\app\jquery-daterangepicker\" />
+    <Folder Include="app\static\app\jquery-daterangepicker\dist\" />
+    <Folder Include="app\static\app\jquery-daterangepicker\src\" />
     <Folder Include="app\static\app\scripts\" />
     <Folder Include="app\templates\" />
     <Folder Include="app\templates\app\" />
     <Folder Include="E_Energy\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\jquery-daterangepicker\dist\daterangepicker.css" />
+    <Content Include="app\static\app\jquery-daterangepicker\dist\daterangepicker.min.css" />
+    <Content Include="app\static\app\jquery-daterangepicker\dist\jquery.daterangepicker.min.js" />
+    <Content Include="app\static\app\jquery-daterangepicker\src\daterangepicker.scss" />
+    <Content Include="app\static\app\jquery-daterangepicker\src\jquery.daterangepicker.js" />
     <Content Include="app\static\app\scripts\moment-with-locales.js" />
     <Content Include="app\static\app\scripts\script.js">
       <SubType>Code</SubType>

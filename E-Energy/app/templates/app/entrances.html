@@ -6,14 +6,13 @@
 <div class="filter d-block">
 	<form class="form" method="post">
 		{% csrf_token %}
-	    {{ form }}
-	    <input type="submit" value="Применить фильтр"/> 
+		<input type="text" id="date_pick" name="date_pick"/>			    
+	    <input class="btn btn-primary" type="submit" value="Применить фильтр"/> 
 	</form>
 </div>
 
 <div class="container entrances">
     {% for name, values in data.items %}		
-		
 			{% cycle '<div class="row">' '' %}
 				<div class="col-6">
 					<h4 class="font-weight-bold">{{name}}</h4>

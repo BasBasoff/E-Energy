@@ -83,9 +83,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'sql_server.pyodbc',
         'NAME': 'powerdb',
+<<<<<<< HEAD
         'HOST': 'WIN-6VC1BFN6VT4\SQLEXPRESS',
         'USER': 'KF-Energy',
         'PASSWORD':'ox^pCaZzx8',
+=======        
+>>>>>>> 1f7c6f990b1124b3ff408bdf3a6a779c138abc03
         'OPTIONS':{
             'driver':'ODBC Driver 17 for SQL Server'            
             }
