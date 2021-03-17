@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'powerdb',
         'HOST': 'localhost',
         'USER': 'bassist',
-        'PASSWORD':'12345',
+        'PASSWORD':'bassist',
         #'USER': 'KF-Energy',
         #'PASSWORD':'ox^pCaZzx8',
         'OPTIONS':{

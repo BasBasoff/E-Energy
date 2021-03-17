@@ -1,3 +1,17 @@
+if (date_pick) {
+	$('#date_pick').dateRangePicker({
+		startOfWeek: 'monday',
+		separator: ' ~ ',
+		format: 'YYYY-MM-DD HH:mm',
+		autoClose: true,
+		time: {
+			enabled: true
+		},
+		defaultTime: moment().startOf('day').toDate(),
+		defaultEndTime: moment().endOf('day').toDate()
+	})
+}
+
 $('.chart').each(function () {
 	var cnvs = $(this).children('canvas');
 	var i = $(this).children('input');	
@@ -56,45 +70,48 @@ $('.chart').each(function () {
 	})
 })
 
-var cnvs = $('.economy-chart').children('canvas');
-var inp = $('.economy-chart').children('input');
-inp = inp[0] ? inp[0].value : '';
-
-var data = {
-	values: [],
-	labels: []
-};
-try {
-	parsed = JSON.parse(inp)	
-}
-catch (e) { console.error(e) }
-
-for (d in parsed) {
-	data.labels.push(d)
-}
-data.labels.sort()
-for (d of data.labels) {
-	data.values.push(parsed[d])
-}
-
-var chart = new Chart(cnvs, {
-	type: 'line',
-	data: {
-		labels: data.labels,
-		datasets: [{			
-			label: "Economy",
-			data: data.values,
-			borderColor: 'orange',
-			fill: false,
-			radius: 1,
-			hitRadius: 7,
-			hoverRadius: 5
-		}]
-	},
-	options: {		
-		lineTension: 0
+if ($('.economy-chart')) {
+	var cnvs = $('.economy-chart').children('canvas');
+	var inp = $('.economy-chart').children('input');
+	inp = inp[0] ? inp[0].value : '';
+	
+	var data = {
+		values: [],
+		labels: []
+	};
+	try {
+		parsed = JSON.parse(inp)	
 	}
-})
+	catch (e) { console.error(e) }
+	
+	for (d in parsed) {
+		data.labels.push(d)
+	}
+	data.labels.sort()
+	for (d of data.labels) {
+		data.values.push(parsed[d])
+	}
+	
+	var chart = new Chart(cnvs, {
+		type: 'line',
+		data: {
+			labels: data.labels,
+			datasets: [{			
+				label: "Economy",
+				data: data.values,
+				borderColor: 'orange',
+				fill: false,
+				radius: 1,
+				hitRadius: 7,
+				hoverRadius: 5
+			}]
+		},
+		options: {		
+			lineTension: 0
+		}
+	})
+}
+
 
 if (tarif) {
 	tarif.onchange = function () {

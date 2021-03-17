@@ -18,21 +18,21 @@ class BootstrapAuthenticationForm(AuthenticationForm):
                                    'class': 'form-control',
                                    'placeholder':'Password'}))
 
-class FilterForm (forms.Form):
-    date_from = forms.DateTimeField(required=False,
-                                    label=_("Начало периода"),
-                                    widget=forms.DateTimeInput(
-                                            format='%Y-%m-%d %H:%M',
-                                            attrs={
-                                                'type':'datetime-local'
-                                                }), 
-                                            localize=True)
-    date_to = forms.DateTimeField(required=False,
-                                  label=_("Конец периода"),
-                                  widget=forms.DateTimeInput(
-                                        format='%Y-%m-%d %H:%M', 
-                                        attrs={
-                                            'type':'datetime-local'
-                                            }),
-                                        localize=True)
+#class FilterForm (forms.Form):
+#    date_from = forms.DateTimeField(required=False,
+#                                    label=_("Начало периода"),
+#                                    widget=forms.DateTimeInput(
+#                                            format='%Y-%m-%d %H:%M',
+#                                            attrs={
+#                                                'type':'datetime-local'
+#                                                }), 
+#                                            localize=True)
+#    date_to = forms.DateTimeField(required=False,
+#                                  label=_("Конец периода"),
+#                                  widget=forms.DateTimeInput(
+#                                        format='%Y-%m-%d %H:%M', 
+#                                        attrs={
+#                                            'type':'datetime-local'
+#                                            }),
+#                                        localize=True)
     

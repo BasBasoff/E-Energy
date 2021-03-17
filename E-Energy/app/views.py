@@ -14,106 +14,31 @@ from django.db.models.functions import Trunc
 from collections import defaultdict
 from datetime import datetime
 
-from .forms import FilterForm
 from .models import *
 
 @login_required
 def home(request):
     devices = Device.objects.filter(devices__profile__user_auth_id = request.user.id)
-    form = FilterForm()
     devices_dict = {}
     power_dict = {}
 
     for dev in devices:
         params_list = []		
         dev_adapters_params = AdapterParameters.objects.filter(id_adapter__in = dev.adapters.all()).select_related('id_adapter')
-        #p_AU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 1',
-        #                                id_adapter__adapter_name__icontains = 'вход',
-        #                                )
-        #p_BU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 2',
-        #                                id_adapter__adapter_name__icontains = 'вход',
-        #                                )
-        #p_CU1 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 3',
-        #                                id_adapter__adapter_name__icontains = 'вход',
-        #                                )
-        #
-        #p_AI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 1',
-        #                                id_adapter__adapter_name__icontains = 'вход',
-        #                                )
-        #p_BI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 2',
-        #                                id_adapter__adapter_name__icontains = 'вход',
-        #                                )
-        #p_CI1 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 3',
-        #                                id_adapter__adapter_name__icontains = 'вход',
-        #                                )
-        #
-        #p_AU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 1',
-        #                                id_adapter__adapter_name__icontains = 'выход',
-        #                                )
-        #p_BU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 2',
-        #                                id_adapter__adapter_name__icontains = 'выход',
-        #                                )
-        #p_CU2 = dev_adapters_params.get(parameter_name__contains = 'Напряжение фазы 3',
-        #                                id_adapter__adapter_name__icontains = 'выход',
-        #                                )
-        #
-        #p_AI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 1',
-        #                                id_adapter__adapter_name__icontains = 'выход',
-        #                                )
-        #p_BI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 2',
-        #                                id_adapter__adapter_name__icontains = 'выход',
-        #                                )
-        #p_CI2 = dev_adapters_params.get(parameter_name__contains = 'Ток фазы 3',
-        #                                id_adapter__adapter_name__icontains = 'выход',
-        #                                )
         
         if request.method == 'POST':
-            form = FilterForm(request.POST)
-            if form.is_valid():
-                date_from = form.cleaned_data['date_from']                
-                date_to = form.cleaned_data['date_to']                
-            else:
-                return
-        else:
-            form = FilterForm() 
+            date_from = datetime.strptime(request.POST['date_pick'].split(' ~ ')[0], '%Y-%m-%d %H:%M')                
+            date_to = datetime.strptime(request.POST['date_pick'].split(' ~ ')[1], '%Y-%m-%d %H:%M')
+        else:            
             date_to = CachingRecord.objects.filter(adapter_id__in = dev.adapters.all()).aggregate(
                                 max_date=Max('record_time')
                             )['max_date']
             if date_to is None:
                 continue
-            date_from = date_to - timedelta(hours=12) if date_to else None
+            date_from = date_to - timedelta(days=1) if date_to else None
         
         segmentation = 'hour'        
         
-        #Params_by_hour = CachingRecord.objects.filter(
-        #record_time__gte = date_from,
-        #record_time__lte = date_to)\
-        #    .annotate(
-        #        data_date = Trunc('record_time', segmentation, tzinfo=None),
-        #    ).values('data_date').annotate(
-        #        p_AU1=Avg('measure_value', filter=Q(parameter_id = p_AU1.pk)),
-        #        p_AI1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk)),
-        #        p_BU1=Avg('measure_value', filter=Q(parameter_id = p_BU1.pk)),
-        #        p_BI1=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk)),
-        #        p_CU1=Avg('measure_value', filter=Q(parameter_id = p_CU1.pk)),
-        #        p_CI1=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk)),
-        #        p_AU2=Avg('measure_value', filter=Q(parameter_id = p_AU2.pk)),
-        #        p_AI2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk)),
-        #        p_BU2=Avg('measure_value', filter=Q(parameter_id = p_BU2.pk)),
-        #        p_BI2=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk)),
-        #        p_CU2=Avg('measure_value', filter=Q(parameter_id = p_CU2.pk)),
-        #        p_CI2=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk)),                
-        #        total_power = Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*0.93 +
-        #                      Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*0.93 +
-        #                      Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*0.93,
-        #        x1=Avg('measure_value', filter=Q(parameter_id = p_AI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU2.pk))*0.93,
-        #        x2=Avg('measure_value', filter=Q(parameter_id = p_AI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_AU1.pk))*0.93,
-        #        x3=Avg('measure_value', filter=Q(parameter_id = p_BI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU2.pk))*0.93,
-        #        x4=Avg('measure_value', filter=Q(parameter_id = p_BI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_BU1.pk))*0.93,
-        #        x5=Avg('measure_value', filter=Q(parameter_id = p_CI1.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU2.pk))*0.93,
-        #        x6=Avg('measure_value', filter=Q(parameter_id = p_CI2.pk))*Avg('measure_value', filter=Q(parameter_id = p_CU1.pk))*0.93,
-        #    )
-
         Params_by_hour = CachingRecord.objects.filter(
         adapter_id__in = dev.adapters.all(),
         record_time__gte = date_from,
@@ -144,15 +69,12 @@ def home(request):
         total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list])/1000)#Суммирование и округление до третьего знака
         #Рассчёт экономии
         XP = "{0:.3f}".format(sum([100-_['xp'] for _ in Params_by_hour_list])/1000) #Экономия в Квт*ч
-        XP_percent = "{0:.3f}".format(float(XP)/float(total_power)*100)
+        XP_percent = "{0:.3f}".format((float(XP)/float(total_power)*100) if total_power != 0 else 0)
         #Подготовка данных для графика экономии
         for el in Params_by_hour_list:
             power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(el['x0']/el['x8']*100))
         #Сбор данных напряжения и тока в таблицу
         #   Вход
-        #last_record_in = CachingRecord.objects.filter(adapter_id__in = dev.adapters.all()).aggregate(
-        #                        max_date=Max('record_time')
-        #                    )['max_date']        
         AU1 = "{0:.3f}".format(Params_by_hour.last()['p_AU1'])
         BU1 = "{0:.3f}".format(Params_by_hour.last()['p_BU1'])
         CU1 = "{0:.3f}".format(Params_by_hour.last()['p_CU1'])
@@ -160,8 +82,6 @@ def home(request):
         BI1 = "{0:.3f}".format(Params_by_hour.last()['p_BI1'])
         CI1 = "{0:.3f}".format(Params_by_hour.last()['p_CI1'])
         #   Выход
-        
-
         AU2 = "{0:.3f}".format(Params_by_hour.last()['p_AU2'])
         BU2 = "{0:.3f}".format(Params_by_hour.last()['p_BU2'])
         CU2 = "{0:.3f}".format(Params_by_hour.last()['p_CU2'])
@@ -182,8 +102,7 @@ def home(request):
         request,
         'app/index.html',
         {
-            'title':'KF-Energy',
-            'form': form,
+            'title':'KF-Energy',            
             'devices':devices_dict,
             'power_array': power_json
         }
@@ -199,21 +118,15 @@ def entrances(request, device):
     dev = Device.objects.get(pk = device)
     
     if request.method == 'POST':
-        form = FilterForm(request.POST)
-        if form.is_valid():
-            date_from = form.cleaned_data['date_from']                
-            date_to = form.cleaned_data['date_to']                
-        else:
-            return
-    else:
-        form = FilterForm() 
+       date_from = datetime.strptime(request.POST['date_pick'].split(' ~ ')[0], '%Y-%m-%d %H:%M')                
+       date_to = datetime.strptime(request.POST['date_pick'].split(' ~ ')[1], '%Y-%m-%d %H:%M')        
+    else:        
         date_to = CachingRecord.objects.filter(adapter_id__in = Device.objects.get(pk = device).adapters.all()).aggregate(
                             max_date=Max('record_time')
                         )['max_date']
         if date_to is None:
             return #TODO: Сообщение: "Нет данных"
         date_from = date_to - timedelta(days = 1) if date_to else None
-       
 
     if date_to - date_from <= timedelta(hours=3):
         segmentation = 'minute'
@@ -240,7 +153,6 @@ def entrances(request, device):
               ('p_BI2','Выход. Ток фазы 2'),
               ('p_CU2','Выход. Напряжение фазы 3'),
               ('p_CI2','Выход. Ток фазы 3'),]
-    
        
     data_query = CachingRecord.objects.filter(
                                             adapter_id__in=dev.adapters.all(), 
@@ -296,8 +208,8 @@ def entrances(request, device):
         request,
         'app/entrances.html',        
         {
-            'data': dict(data_dict),            
-            'form':form,
+            'data': dict(data_dict),           
+            
             'device': device
         }
     )
