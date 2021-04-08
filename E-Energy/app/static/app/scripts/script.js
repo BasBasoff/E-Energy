@@ -8,7 +8,7 @@ if (date_pick) {
 			enabled: true
 		},
 		defaultTime: moment().startOf('day').toDate(),
-		defaultEndTime: moment().endOf('day').toDate()
+		defaultEndTime: moment().endOf('day').toDate(),		
 	})
 }
 

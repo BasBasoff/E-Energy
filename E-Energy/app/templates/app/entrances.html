@@ -3,10 +3,10 @@
 {% block content %}
 
 <h2>{{ device.device_name }}</h2>
-<div class="filter d-block">
-	<form class="form" method="post">
+<div class="filter d-flex">
+	<form class="form d-flex" method="post">
 		{% csrf_token %}
-		<input type="text" id="date_pick" name="date_pick"/>			    
+		<input class="form-control" type="text" id="date_pick" name="date_pick"/>			    
 	    <input class="btn btn-primary" type="submit" value="Применить фильтр"/> 
 	</form>
 </div>
