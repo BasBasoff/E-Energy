@@ -68,12 +68,8 @@ def home(request):
         #   Суммирование мощности по фазам
         total_power = "{0:.3f}".format(sum([_['total_power'] for _ in Params_by_hour_list])/1000)#Суммирование и округление до третьего знака
         #Рассчёт экономии
-<<<<<<< HEAD
-
-=======
         XP = "{0:.3f}".format(sum([100-_['xp'] for _ in Params_by_hour_list])/1000) #Экономия в Квт*ч
         XP_percent = "{0:.3f}".format((float(XP)/float(total_power)*100) if total_power != 0 else 0)
->>>>>>> 1f7c6f990b1124b3ff408bdf3a6a779c138abc03
         #Подготовка данных для графика экономии
         for el in Params_by_hour_list:
             power_dict[str(el['data_date'].replace(tzinfo=None))] = "{0:.3}".format(100-(el['x0']/el['x8']*100))
